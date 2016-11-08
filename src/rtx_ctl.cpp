@@ -538,4 +538,41 @@ ERR:
     finish = true;
   }
 
+  void LSPlacedBallInit::init() {
+    Motion::stop();
+  }
+
+  int LSPlacedBallInit::run() {
+    //Move to ball until 500mm away
+
+    return 1;
+  }
+
+  bool LSPlacedBallInit::isRunnable() {
+    return true;
+  }
+
+  void LSWaitForEnemyKickoff::init(){
+    Motion::stop();
+    kickoffTimer.setPeriod(5000);
+  }
+
+  int LSWaitForEnemyKickoff::run(){
+    kickoffTimer.start();
+
+    while(!gameStarted){
+      if (kickoffTimer.isTime()) {
+        gameStarted = true;
+      }
+      /*else if(the ball has moved more than 10cm){
+        gameStarted = true;
+      }*/
+    }
+
+  }
+
+  bool LSWaitForEnemyKickoff::isRunnable(){
+    return true;
+  }
+
 }}
