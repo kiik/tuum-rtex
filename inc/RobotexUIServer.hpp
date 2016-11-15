@@ -9,6 +9,7 @@
 #include "WebSocketServer.hpp"
 
 #include "protocol/rtex_DriveProtocol.hpp"
+#include "protocol/rtex_VisionProtocol.hpp"
 
 using namespace tuum::wsocs;
 
@@ -29,14 +30,18 @@ namespace tuum { namespace gui {
     };
 
   protected:
+
     void onGet();
 
     void onConnect();
     void onMessage(lws*, void*, size_t);
     void onMessage(WSProtocol::Message);
 
+    int send(json& dat);
+
   private:
-    DriveProtocol mDrvProtocol;
+    DriveProtocol  mDrvProtocol;
+    VisionProtocol mVisProtocol;
 
   };
 
