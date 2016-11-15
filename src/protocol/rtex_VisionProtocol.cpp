@@ -30,6 +30,8 @@ namespace tuum {
 
     if(cmd == "getFrame") {
       return getFrame(m.dat);
+    } else if (cmd == "settings") {
+      return toggleThresholding(m.dat);
     }
 
     return -1;
@@ -59,6 +61,14 @@ namespace tuum {
     }
 
     return -1;
+  }
+
+  int VisionProtocol::toggleThresholding(const json& dat) {
+    if(dat["threshold"].get<bool>() == true)
+      tuum::gVision->setThresholding(true);
+    else
+      tuum::gVision->setThresholding(false);
+    return 0;
   }
 
 }
