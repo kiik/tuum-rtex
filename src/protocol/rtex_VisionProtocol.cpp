@@ -25,6 +25,11 @@ namespace tuum {
     return out;
   }
 
+  const char* JS_METHOD = "m";
+  const char* JS_MTH_GET = "get";
+  const char* JS_MTH_PUT = "put";
+  const char* JS_DATA = "data";
+
   int VisionProtocol::route(const WSProtocol::Message& m) {
     std::string cmd = m.dat[WSProtocol::JS_CMD].get<std::string>();
 
@@ -32,6 +37,14 @@ namespace tuum {
       return getFrame(m.dat);
     } else if (cmd == "settings") {
       return toggleThresholding(m.dat);
+    } else if (cmd == "filters") {
+      if(m.dat[JS_METHOD].get<std::string>() == JS_MTH_GET) {
+
+      } else if(m.dat[JS_METHOD].get<std::string>() == JS_MTH_PUT) {
+
+      }
+    } else if(cmd =="pplcnf") {
+      return pplConfig(m.dat[JS_DATA]);
     }
 
     return -1;
@@ -68,6 +81,11 @@ namespace tuum {
       tuum::gVision->setThresholding(true);
     else
       tuum::gVision->setThresholding(false);
+    return 0;
+  }
+
+  int VisionProtocol::pplConfig(const json& dat) {
+    tuum::gVision->pplConfig(dat);
     return 0;
   }
 

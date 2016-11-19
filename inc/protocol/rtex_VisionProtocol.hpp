@@ -20,6 +20,7 @@ namespace tuum {
     int getFrame(const json&);
 
     int toggleThresholding(const json&);
+    int pplConfig(const json&);
 
   private:
 
