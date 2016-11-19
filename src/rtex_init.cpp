@@ -3,11 +3,17 @@
 
 #include "tuum_platform.hpp"
 #include "tuum_lpx.hpp"
+#include "rtx_fb.hpp"
+#include "tuum_visioning.hpp"
+#include "hal.hpp"
 
 #include "htgui.hpp"
 #include "RobotexUIServer.hpp"
 
 #include "application.hpp"
+
+#include "STM.hpp"
+#include "LogicManager.hpp"
 
 tuum::gui::RobotexUIServer uiSrv;
 

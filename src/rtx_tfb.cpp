@@ -25,6 +25,8 @@ namespace tuum { namespace TFBLogic {
 
   STM* lg_defKickoff = nullptr;
 
+  STM* lg_game = nullptr;
+
 
   STM* logicProcess;
 
@@ -94,9 +96,12 @@ namespace tuum { namespace TFBLogic {
     if(v == "Attacker") {
       lg_preKickoff = LogicManager::loadKickoffReceiverPrepare();
       lg_kickoff = LogicManager::loadKickoffReceiver();
+      lg_game = LogicManager::loadOffensivePlay();
+
     } else if(v == "Goalee") {
       lg_preKickoff = LogicManager::loadKickoffPasserPrepare();
       lg_kickoff = LogicManager::loadKickoffPasser();
+      lg_game = LogicManager::loadDefensivePlay();
      }
   }
 
@@ -118,7 +123,10 @@ namespace tuum { namespace TFBLogic {
 
         } else {
           std::cout << "opposing";
-          //TODO
+          logicProcess = LogicManager::enemyKikcoff();
+          logicProcess->setup();
+          logicProcess = lg_game;
+          logicProcess->setup();
         }
 
         logicProcess->registerEventListener(logicProcess->getEventID("LSDone"), [=](){
@@ -127,26 +135,53 @@ namespace tuum { namespace TFBLogic {
 
         break;
       case GamePhase::GAME:
-        if(role == "Attacker")
-        {
-          logicProcess = LogicManager::loadOffensivePlay();
-        }
-        else if(role == "Goalee")
-        {
-          logicProcess = LogicManager::loadDefensivePlay();
-        }
+        logicProcess = lg_game;
         logicProcess->setup();
         break;
       case GamePhase::KICKOFF_GOAL:
         break;
       case GamePhase::FREEKICK_DIRECT:
-        if(role == "Attacker")
-        {
-          logicProcess = LogicManager::moveToBall();
+        if(to_our_team) {
+
+          logicProcess = lg_game;
           logicProcess->setup();
+
+        } else {
+
+
         }
+
+        updateGamePhase(GamePhase::GAME);
         break;
+
       case GamePhase::FREEKICK_INDIRECT:
+
+        if(to_our_team) {
+
+          logicProcess = lg_game;
+          logicProcess->setup();
+
+        } else {
+
+          logicProcess = LogicManager::enemyKikcoff();
+          logicProcess->setup();
+          logicProcess = lg_game;
+          logicProcess->setup();
+
+        }
+
+        logicProcess = lg_kickoff;
+        logicProcess->setup();
+
+        logicProcess->registerEventListener(logicProcess->getEventID("LSDone"), [=](){
+          updateGamePhase(GamePhase::GAME);
+        });
+
+        break;
+      case GamePhase::THROWIN:
+
+      if(to_our_team) {
+
         if(role == "Goalee")
         {
           logicProcess = LogicManager::moveToBall();
@@ -156,17 +191,11 @@ namespace tuum { namespace TFBLogic {
             logicProcess = lg_preKickoff;
         }
         logicProcess->setup();
-        break;
-      case GamePhase::THROWIN:
-      if(role == "Goalee")
-      {
-        logicProcess = LogicManager::moveToBall();
+
+      } else {
+
       }
-      else
-      {
-          logicProcess = lg_preKickoff;
-      }
-      logicProcess->setup();
+
         break;
       case GamePhase::NONE:
       default:

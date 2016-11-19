@@ -341,7 +341,7 @@ ERR:
       if(!Motion::isRunning()) Motion::start();
     } else {
       Motion::stop();
-      if(mb->getBallSensorState()) mb->doCoilKick();
+      //if(mb->getBallSensorState()) mb->doCoilKick();
     }
 
     return 0;
@@ -490,7 +490,7 @@ ERR:
 
         MainBoard* mb = hal::hw.getMainBoard();
         mb->stopDribbler();
-        mb->doWeakCoilKick();
+        //mb->doWeakCoilKick();
 
         emit("done");
       }
@@ -545,6 +545,26 @@ ERR:
   int LSPlacedBallInit::run() {
     //Move to ball until 500mm away
 
+    /*Ball* b = gNavigation->getNearestBall();
+
+    if(b != nullptr) {
+      Vec2i pos = gNavigation->calcPerimeterPosition(b->getTransform(), 500).getPosition();
+
+      Motion::setPositionTarget(pos);
+      Motion::setAimTarget(b->getTransform()->getPosition());
+
+      Transform* t = Localization::getTransform();
+      double d = t->distanceTo(b->getTransform()->getPosition());
+
+      if(d > 500) {
+        if(!Motion::isRunning()) Motion::start();
+      } else {
+        Motion::stop();
+      }
+    } else {
+      Motion::stop();
+    }*/
+
     return 1;
   }
 
@@ -561,6 +581,7 @@ ERR:
     kickoffTimer.start();
 
     while(!gameStarted){
+
       if (kickoffTimer.isTime()) {
         gameStarted = true;
       }
@@ -571,8 +592,6 @@ ERR:
 
   }
 
-  bool LSWaitForEnemyKickoff::isRunnable(){
-    return true;
-  }
+  //void scanForBallMovement
 
 }}
