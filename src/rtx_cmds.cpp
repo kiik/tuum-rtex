@@ -11,4 +11,12 @@ namespace tuum { namespace cmds {
     hal::hw.getMotorControl()->omniDrive(spd, dir, rot);
   }
 
+  int dribble(float pwr) {
+    hal::hw.getMainBoard()->startDribbler(pwr);
+  }
+
+  int kickcoil() {
+    hal::hw.getMainBoard()->coilKick();
+  }
+
 }}

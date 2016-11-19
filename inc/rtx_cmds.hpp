@@ -6,6 +6,10 @@ namespace tuum { namespace cmds {
 
   int drive(float, float, float);
 
+  int dribble(float);
+
+  int kickcoil();
+
 }}
 
 #endif
