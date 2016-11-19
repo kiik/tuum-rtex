@@ -194,4 +194,77 @@ namespace tuum {
 
   ////////////////////////////////////////////
 
+  STM* LogicManager::placedBall()
+  {
+
+    STM* stm = new STM();
+    State* st, *st2;
+    Context ctx;
+
+    st = stm->createState("STBallLocate");
+    stm->setState(st);
+    ctx.st = st;
+    st->addController(new ctl::LSBallLocate(ctx));
+
+
+    st2 = stm->createState("STPlacedBallInit");
+    st2->setLastState(st);
+    st->setNextState(st2);
+    st = st2;
+    ctx.st = st;
+    st->addController(new ctl::LSPlacedBallInit(ctx));
+
+    if (false)
+    {
+      stm = loadOffensivePlay();
+    }
+    std::cout << "State placed ball" << std::endl;
+
+    return stm;
+  }
+
+  STM* LogicManager::enemyKikcoff()
+  {
+    STM* stm = new STM();
+    State* st, *st2;
+    Context ctx;
+
+    //Move to centerline
+
+    /*st2 = stm-> createState("STWaitForEnemyKickoff");
+    st2->setLastState(st);
+    st->setNextState(st2);
+    st = st2;
+    ctx.st = st
+    st->addController(new ctl::LSWaitForEnemyKickoff(ctx))*/
+
+    //offensive play
+
+    std::cout << "State enemyKikcoff" << std::endl;
+
+    return stm;
+  }
+
+  STM* LogicManager::moveToBall()
+  {
+    STM* stm = new STM();
+    State* st, *st2;
+    Context ctx;
+
+    st = stm->createState("STBallLocate");
+    stm->setState(st);
+    ctx.st = st;
+    st->addController(new ctl::LSBallLocate(ctx));
+
+
+    st2 = stm->createState("STMoveToBall");
+    st2->setLastState(st);
+    st->setNextState(st2);
+    st = st2;
+    ctx.st = st;
+    st->addController(new ctl::LSBallNavigator(ctx));
+
+    return stm;
+
+  }
 }

@@ -256,6 +256,32 @@ namespace tuum { namespace ctl {
       bool finish;
   };
 
+  class LSPlacedBallInit : public Controller {
+  public:
+    LSPlacedBallInit(Context _ctx) : ctx(_ctx) {}
+
+    void init();
+    int run();
+    bool isRunnable();
+
+  private:
+    Context ctx;
+  };
+
+  class LSWaitForEnemyKickoff : public Controller{
+  public:
+    LSWaitForEnemyKickoff(Context _ctx) : ctx(_ctx) {}
+
+    void init();
+    int run();
+    bool isRunnable();
+
+  private:
+    Timer kickoffTimer;
+    Context ctx;
+    bool gameStarted = false;
+  };
+
 }}
 
 #endif // RTX_CTL_H

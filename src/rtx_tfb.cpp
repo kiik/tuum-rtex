@@ -103,7 +103,10 @@ namespace tuum { namespace TFBLogic {
 
   // State update methods
   void updateGamePhase(GamePhase gp, bool to_our_team) {
+
+    std::string role;
     gmPhase = gp;
+    role = gC.getStr("Robot.Role");
 
     switch(gmPhase) {
       case GamePhase::KICKOFF:
@@ -124,17 +127,46 @@ namespace tuum { namespace TFBLogic {
 
         break;
       case GamePhase::GAME:
-        //TODO: switch to defensive/offensive logic.
-        std::cout << "TODO: GamePhase::GAME Transition" << std::endl;
-        logicProcess = nullptr;
+        if(role == "Attacker")
+        {
+          logicProcess = LogicManager::loadOffensivePlay();
+        }
+        else if(role == "Goalee")
+        {
+          logicProcess = LogicManager::loadDefensivePlay();
+        }
+        logicProcess->setup();
         break;
       case GamePhase::KICKOFF_GOAL:
         break;
       case GamePhase::FREEKICK_DIRECT:
+        if(role == "Attacker")
+        {
+          logicProcess = LogicManager::moveToBall();
+          logicProcess->setup();
+        }
         break;
       case GamePhase::FREEKICK_INDIRECT:
+        if(role == "Goalee")
+        {
+          logicProcess = LogicManager::moveToBall();
+        }
+        else
+        {
+            logicProcess = lg_preKickoff;
+        }
+        logicProcess->setup();
         break;
       case GamePhase::THROWIN:
+      if(role == "Goalee")
+      {
+        logicProcess = LogicManager::moveToBall();
+      }
+      else
+      {
+          logicProcess = lg_preKickoff;
+      }
+      logicProcess->setup();
         break;
       case GamePhase::NONE:
       default:

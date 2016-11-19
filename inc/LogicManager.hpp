@@ -23,6 +23,11 @@ namespace tuum {
 
     static STM* loadOffensivePlay();
     static STM* loadDefensivePlay();
+
+    static STM* placedBall();
+    static STM* enemyKikcoff();
+
+    static STM* moveToBall();
   };
 
 }
