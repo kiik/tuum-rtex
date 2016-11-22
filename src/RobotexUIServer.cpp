@@ -12,7 +12,11 @@ namespace tuum { namespace gui {
   RobotexUIServer::RobotexUIServer():
     WebSocketServer()
   {
+    mDrvProtocol.setWS(this);
+    mVisProtocol.setWS(this);
+
     size_t id = proto()->add(mDrvProtocol.getDescriptor());
+    id = proto()->add(mVisProtocol.getDescriptor());
   }
 
   void RobotexUIServer::onGet()
@@ -23,6 +27,12 @@ namespace tuum { namespace gui {
   void RobotexUIServer::onConnect()
   {
 
+  }
+
+  int RobotexUIServer::send(json& dat)
+  {
+    dat["_"] = mCtx->mId;
+    return WebSocketServer::send(dat);
   }
 
   void RobotexUIServer::onMessage(lws *wsi, void *in, size_t len)
@@ -46,6 +56,8 @@ namespace tuum { namespace gui {
     auto it = ms.dat.find(WSProtocol::JS_URI);
     if(it == ms.dat.end()) return;
     if(!it.value().is_string()) return;
+
+    mCtx->mId = ms.dat[WSProtocol::JS_M_ID].get<size_t>();
 
     if(proto()->route(ms) < 0) {
       RTXLOG(format("Unknown URI '%s'!", ms.getURI().c_str()), LOG_ERR);

@@ -28,6 +28,7 @@
     'src/RobotexUIServer.cpp',
 
     'src/protocol/rtex_DriveProtocol.cpp',
+    'src/protocol/rtex_VisionProtocol.cpp',
   ],
 
 }
