@@ -335,13 +335,13 @@ ERR:
     Motion::setAimTarget(g->getTransform()->getPosition());
     //std::cout << g->getTransform()->getPosition().toString() << std::endl;;
 ;
-    //if(fabs(Motion::getDeltaOrientation()) < 0.030) mb->doCoilKick();
+    //if(fabs(Motion::getDeltaOrientation()) < 0.030) mb->releaseCoil();
 
     if(!Motion::isTargetAchieved()) {
       if(!Motion::isRunning()) Motion::start();
     } else {
       Motion::stop();
-      if(mb->getBallSensorState()) mb->doCoilKick();
+      if(mb->getBallSensorState()) mb->releaseCoil();
     }
 
     return 0;
@@ -490,7 +490,7 @@ ERR:
 
         MainBoard* mb = hal::hw.getMainBoard();
         mb->stopDribbler();
-        mb->doWeakCoilKick();
+        mb->releaseCoil(); //TODO: Weak kick
 
         emit("done");
       }
