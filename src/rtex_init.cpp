@@ -25,7 +25,7 @@ namespace rtex {
 }
 
 int main(int argc, char* argv[]) {
-  tuum::setGlobalVisioning(rtex::gSys.getVisioning());
+  tuum::setGlobalSystem(&(rtex::gSys));
 
   if(tuum::init(argc, argv) < 0) return -1;
 

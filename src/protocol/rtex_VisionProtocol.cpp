@@ -6,6 +6,7 @@
 
 #include "hal.hpp"
 
+#include "tuum_system.hpp"
 #include "tuum_visioning.hpp"
 #include "tuum_context.hpp"
 
@@ -51,6 +52,8 @@ namespace tuum {
       return pplConfig(m.dat[JS_DATA]);
     } else if(boost::starts_with(cmd, "vf_")) {
       return vFilter(m.dat);
+    } else if(cmd == "ent_get") {
+      return getEntities();
     }
 
     return -1;
@@ -115,6 +118,13 @@ namespace tuum {
       send(res);
     }
 
+    return 0;
+  }
+
+  int VisionProtocol::getEntities() {
+    json dat;
+    tuum::gSystem->getEntityHandle()->toJSON(dat);
+    send(dat);
     return 0;
   }
 

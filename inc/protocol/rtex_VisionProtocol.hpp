@@ -23,6 +23,8 @@ namespace tuum {
     int pplConfig(const json&);
     int vFilter(const json&);
 
+    int getEntities();
+
   private:
 
   };
