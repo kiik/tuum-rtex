@@ -21,6 +21,7 @@ namespace tuum {
 
     int toggleThresholding(const json&);
     int pplConfig(const json&);
+    int vFilter(const json&);
 
   private:
 

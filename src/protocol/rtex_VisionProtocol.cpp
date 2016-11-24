@@ -1,4 +1,7 @@
 
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/lexical_cast.hpp>
+
 #include "base64.hpp"
 
 #include "hal.hpp"
@@ -43,8 +46,10 @@ namespace tuum {
       } else if(m.dat[JS_METHOD].get<std::string>() == JS_MTH_PUT) {
 
       }
-    } else if(cmd =="pplcnf") {
+    } else if(cmd == "pplcnf") {
       return pplConfig(m.dat[JS_DATA]);
+    } else if(boost::starts_with(cmd, "vf_")) {
+      return vFilter(m.dat);
     }
 
     return -1;
@@ -86,6 +91,29 @@ namespace tuum {
 
   int VisionProtocol::pplConfig(const json& dat) {
     tuum::gVision->pplConfig(dat);
+    return 0;
+  }
+
+  int VisionProtocol::vFilter(const json& dat) {
+    std::string cmd = dat[WSProtocol::JS_CMD].get<std::string>();
+
+    if(boost::ends_with(cmd, "get")) {
+      json res;
+      tuum::gVision->getFilter()->toJSON(res);
+      res["_r"] = "OK";
+      send(res);
+    } else if(boost::ends_with(cmd, "set")) {
+      auto r = dat["f"]["range"];
+      VisionFilter::ColorClass cls = {r[0], r[1], r[2], r[3], r[4], r[5]};
+      cls.id = dat["f"]["id"];
+      printf("SET %s\n", dat.dump().c_str());
+      tuum::gVision->getFilter()->updateYUVClassifier(cls);
+
+      json res;
+      res["_r"] = "OK";
+      send(res);
+    }
+
     return 0;
   }
 
