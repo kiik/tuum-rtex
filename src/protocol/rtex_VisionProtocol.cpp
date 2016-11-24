@@ -7,6 +7,7 @@
 #include "hal.hpp"
 
 #include "tuum_visioning.hpp"
+#include "tuum_context.hpp"
 
 #include "lpx_iformat.hpp"
 #include "rtx_cmds.hpp"

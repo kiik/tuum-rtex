@@ -23,6 +23,7 @@
     'src/rtx_cmds.cpp',
 
     'src/rtex_init.cpp',
+    'src/rtex.cpp',
 
     'src/LogicManager.cpp',
     'src/RobotexUIServer.cpp',
