@@ -10,6 +10,9 @@
 #include "STM.hpp"
 #include "LogicManager.hpp"
 
+#include "tuum_motion.hpp"
+#include "tuum_context.hpp"
+
 #include "rtx_tfb.hpp"
 
 using namespace tuum::hal;
@@ -41,7 +44,7 @@ namespace tuum { namespace TFBLogic {
   void process() {
     switch(gmState) {
       case GameState::STOP:
-        if(Motion::isRunning()) Motion::stop();
+        if(gMotion->isRunning()) gMotion->stop();
         break;
       case GameState::PLACEDBALL:
         //TODO: prepare for game phase?
@@ -75,7 +78,7 @@ namespace tuum { namespace TFBLogic {
 
     ref->registerCallback(REF_STOP, [=](RefCommand rcmd){
       stop();
-      Motion::stop();
+      gMotion->stop();
       hw.getMotorControl()->omniDrive(0, 0.0, 0);
       MainBoard* mb = hw.getMainBoard();
       mb->stopDribbler();

@@ -22,26 +22,22 @@
 
 namespace tuum {
 
-  namespace Motion {
-    class TwitchScan {
-    private:
-      Timer motionTimer;
-      Timer visionTimer;
-      bool wait_for_vision;
+  class TwitchScan {
+  private:
+    Timer motionTimer;
+    Timer visionTimer;
+    bool wait_for_vision;
 
-      int m_spv = 5;
-      int m_sps = 40;
+    int m_spv = 5;
+    int m_sps = 40;
 
-      void _init();
-    public:
-      void init();
-      void init(int, int);
+    void _init();
+  public:
+    void init();
+    void init(int, int);
 
-      void run();
-    };
-
-
-  }
+    void run();
+  };
 
 }
 
@@ -77,7 +73,7 @@ namespace tuum { namespace ctl {
 
     private:
       Context ctx;
-      Motion::TwitchScan twitchScanner;
+      TwitchScan twitchScanner;
   };
 
 
@@ -121,7 +117,7 @@ namespace tuum { namespace ctl {
 
     private:
       Context ctx;
-      Motion::TwitchScan twitchScanner;
+      TwitchScan twitchScanner;
   };
 
   //////////////////////
@@ -135,7 +131,7 @@ namespace tuum { namespace ctl {
 
     private:
       Context ctx;
-      Motion::TwitchScan twitchScanner;
+      TwitchScan twitchScanner;
   };
 
   class LSAllyGoalMove : public Controller {
@@ -194,7 +190,7 @@ namespace tuum { namespace ctl {
 
     private:
       Context ctx;
-      Motion::TwitchScan twitchScanner;
+      TwitchScan twitchScanner;
   };
 
   class LSAllyLocate : public Controller {
@@ -207,7 +203,7 @@ namespace tuum { namespace ctl {
 
     private:
       Context ctx;
-      Motion::TwitchScan twitchScanner;
+      TwitchScan twitchScanner;
   };
 
   class LSAllyAim : public Controller {
@@ -220,7 +216,7 @@ namespace tuum { namespace ctl {
 
     private:
       Context ctx;
-      Motion::TwitchScan twitchScanner;
+      TwitchScan twitchScanner;
   };
 
   class LSAllyPass : public Controller {
