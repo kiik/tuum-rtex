@@ -383,12 +383,7 @@ ERR:
     if(!gMotion->isTargetAchieved()) {
       if(!gMotion->isRunning()) gMotion->start();
     } else {
-<<<<<<< HEAD
-      Motion::stop();
-
-=======
       gMotion->stop();
->>>>>>> 7ee32be58a4f60230aa6cf78d6c180b1ae4830e5
       if(mb->getBallSensorState()) mb->releaseCoil();
 
     }
