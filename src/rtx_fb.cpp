@@ -9,6 +9,9 @@
 #include "STM.hpp"
 #include "LogicManager.hpp"
 
+#include "tuum_motion.hpp"
+#include "tuum_context.hpp"
+
 #include "rtx_fb.hpp"
 
 using namespace tuum::hal;
@@ -43,7 +46,7 @@ namespace tuum { namespace FBLogic {
 
   void stop() {
     std::cout << "Stop game." << std::endl;
-    Motion::stop();
+    gMotion->stop();
     hw.getMainBoard()->stopDribbler();
     gmState = GameState::STOP;
   }

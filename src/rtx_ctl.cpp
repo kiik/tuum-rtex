@@ -12,6 +12,7 @@
 #include "tuum_localization.hpp"
 #include "tuum_navigation.hpp"
 #include "tuum_motion.hpp"
+#include "tuum_context.hpp"
 
 #include "hal.hpp"
 
@@ -22,46 +23,41 @@ using namespace tuum::hal;
 
 namespace tuum {
 
-  //TODO: Refactor into separate module.
-  namespace Motion {
+  void TwitchScan::_init() {
+    wait_for_vision = true;
 
-    void TwitchScan::_init() {
-      wait_for_vision = true;
+    motionTimer.setPeriod(160);
+    visionTimer.setPeriod(400);
+  }
 
-      motionTimer.setPeriod(160);
-      visionTimer.setPeriod(400);
-    }
+  void TwitchScan::init() {
+    _init();
+  }
 
-    void TwitchScan::init() {
-      _init();
-    }
+  void TwitchScan::init(int sp_vision, int sp_scan) {
+    m_spv = sp_vision;
+    m_sps = sp_scan;
+    _init();
+  }
 
-    void TwitchScan::init(int sp_vision, int sp_scan) {
-      m_spv = sp_vision;
-      m_sps = sp_scan;
-      _init();
-    }
-
-    void TwitchScan::run() {
-      if(!wait_for_vision) {
-        if(motionTimer.isTime()) {
-          Motion::setAimTarget(Vec2i({0, 1}));
-          motionData.manualRotGear = {m_spv, 3.14};
-          Motion::start();
-          wait_for_vision = true;
-          visionTimer.start();
-        }
-      } else {
-        if(visionTimer.isTime()) {
-          Motion::setAimTarget(Vec2i({0, 1}));
-          motionData.manualRotGear = {m_sps, 3.14};
-          Motion::start();
-          wait_for_vision = false;
-          motionTimer.start();
-        }
+  void TwitchScan::run() {
+    if(!wait_for_vision) {
+      if(motionTimer.isTime()) {
+        gMotion->setAimTarget(vec2i({0, 1}));
+        //motionData.manualRotGear = {m_spv, 3.14};
+        gMotion->start();
+        wait_for_vision = true;
+        visionTimer.start();
+      }
+    } else {
+      if(visionTimer.isTime()) {
+        gMotion->setAimTarget(vec2i({0, 1}));
+        //motionData.manualRotGear = {m_sps, 3.14};
+        gMotion->start();
+        wait_for_vision = false;
+        motionTimer.start();
       }
     }
-
   }
 
 }
@@ -131,8 +127,7 @@ namespace tuum { namespace ctl {
   int LSInit::run() {
     switch(ctx.phase) {
       case CP_INIT:
-        Motion::setBehaviour(Motion::MOT_CURVED);
-        Motion::setTarget(Transform(10, 10, 0));
+        gMotion->setTarget({10, 10});
 
         ctx.phase = CP_RUN;
         break;
@@ -152,8 +147,7 @@ namespace tuum { namespace ctl {
 
   // Ball search
   void LSBallLocate::init() {
-    Motion::stop();
-    Motion::setBehaviour(Motion::MOT_COMPLEX);
+    gMotion->stop();
     twitchScanner.init(5, 30);
     mb->stopDribbler();
   }
@@ -161,7 +155,7 @@ namespace tuum { namespace ctl {
   int LSBallLocate::run() {
     if(gNavigation->countValidBalls() > 0) {
       mb->startDribbler();
-      Motion::stop();
+      gMotion->stop();
       return 0;
     } else {
       twitchScanner.run();
@@ -177,7 +171,7 @@ namespace tuum { namespace ctl {
 
   // Navigate to ball
   void LSBallNavigator::init() {
-    Motion::stop();
+    gMotion->stop();
 
     Ball* b = gNavigation->getNearestBall();
     if(b != nullptr)
@@ -192,31 +186,30 @@ namespace tuum { namespace ctl {
     b = gNavigation->getNearestBall();
 
     if(b != nullptr) {
-      Vec2i pos = gNavigation->calcBallPickupPos(b->getTransform()).getPosition();
+      vec2i pos = gNavigation->calcBallPickupPos(b->getTransform()).getPosition();
 
-      Motion::setPositionTarget(pos);
-      Motion::setAimTarget(b->getTransform()->getPosition());
+      gMotion->setTarget(pos, b->getTransform()->getPosition());
       mb->startDribbler();
 
       //std::cout << d << std::endl;
       //if(d < 250) mb->startDribbler();
       //else mb->stopDribbler();
 
-      if(!Motion::isTargetAchieved()) {
-        if(!Motion::isRunning()) Motion::start();
+      if(!gMotion->isTargetAchieved()) {
+        if(!gMotion->isRunning()) gMotion->start();
       } else {
         goto OK;
       }
     } else {
-      Motion::stop();
+      gMotion->stop();
     }
 
     return 0;
 OK:
-    Motion::stop();
+    gMotion->stop();
     return 1;
 ERR:
-    Motion::stop();
+    gMotion->stop();
     return -1;
   }
 
@@ -227,7 +220,7 @@ ERR:
 
   // Ball pickup
   void LSBallPicker::init() {
-    Motion::stop();
+    gMotion->stop();
     mb->startDribbler();
   }
 
@@ -239,27 +232,26 @@ ERR:
     b = gNavigation->getNearestBall();
 
     if(b != nullptr) {
-      double dD = Motion::VLS_DIST.low;
+      double dD = Motion::DribblerPlanePadding;
       Transform* t = b->getTransform();
       Transform* me = Localization::getTransform();
-      Vec2f avf = (t->getPosition() - me->getPosition()).getNormalized();
-      Motion::setPositionTarget(t->getPosition() + (avf*dD).toInt());
-      Motion::setAimTarget(t->getPosition() + (avf*1.1*dD).toInt());
+      vec2 avf = (t->getPosition() - me->getPosition()).getNormalized();
+      gMotion->setTarget(t->getPosition() + (vec2i)(avf*dD), t->getPosition() + (vec2i)(avf*1.1*dD));
 
       if(me->getPosition().distanceTo(t->getPosition()) > dD) return -1;
 
       mb->startDribbler();
-      if(!Motion::isRunning()) Motion::start();
+      if(!gMotion->isRunning()) gMotion->start();
     } else {
-      Motion::stop();
+      gMotion->stop();
     }
 
     return 0;
 OK:
-    Motion::stop();
+    gMotion->stop();
     return 1;
 ERR:
-    Motion::stop();
+    gMotion->stop();
     mb->stopDribbler();
     return -1;
   }
@@ -272,7 +264,7 @@ ERR:
 
     Transform* t = Localization::getTransform();
     double d = t->distanceTo(b->getTransform()->getPosition());
-    if(d > (Motion::VLS_DIST.mn + Motion::GRS_MOV.mn.step) ) return false;
+    if(d > Motion::MinDist) return false;
 
     return true;
   }
@@ -288,7 +280,7 @@ ERR:
   }
 
   void LSGoalLocate::init() {
-    Motion::stop();
+    gMotion->stop();
     ctx.phase = CP_INIT;
     twitchScanner.init(10, 30);
     mb->startDribbler();
@@ -302,17 +294,17 @@ ERR:
 
     return 0;
 OK:
-    Motion::stop();
+    gMotion->stop();
     return 1;
 ERR:
-    Motion::stop();
+    gMotion->stop();
     return -1;
   }
 
 
   ////////////////////
   void LSAllyGoalLocate::init() {
-    Motion::stop();
+    gMotion->stop();
     ctx.phase = CP_INIT;
     twitchScanner.init(10, 30);
   }
@@ -326,7 +318,7 @@ ERR:
   }
 
   void LSAllyGoalMove::init() {
-    Motion::stop();
+    gMotion->stop();
 
     Goal* goal = gNavigation->getAllyGoal();
     if(goal != nullptr)
@@ -339,30 +331,29 @@ ERR:
     //if(väravat ei leitud) goto ERR;
 
     if(goal != nullptr) {
-      Vec2i pos = gNavigation->calcAllyGoalPos(goal->getTransform()).getPosition();
+      vec2i pos = gNavigation->calcAllyGoalPos(goal->getTransform()).getPosition();
 
-      Motion::setPositionTarget(pos);
-      Motion::setAimTarget(goal->getTransform()->getPosition());
+      gMotion->setTarget(pos, goal->getTransform()->getPosition());
 
       //std::cout << d << std::endl;
       //if(d < 250) mb->startDribbler();
       //else mb->stopDribbler();
 
-      if(!Motion::isTargetAchieved()) {
-        if(!Motion::isRunning()) Motion::start();
+      if(!gMotion->isTargetAchieved()) {
+        if(!gMotion->isRunning()) gMotion->start();
       } else {
         goto OK;
       }
     } else {
-      Motion::stop();
+      gMotion->stop();
     }
 
     return 0;
 OK:
-    Motion::stop();
+    gMotion->stop();
     return 1;
 ERR:
-    Motion::stop();
+    gMotion->stop();
     return -1;
   }
 
@@ -374,7 +365,7 @@ ERR:
 
   // Shoot to opposing goal
   void LSGoalShoot::init() {
-    Motion::stop();
+    gMotion->stop();
   }
 
   int LSGoalShoot::run() {
@@ -383,17 +374,21 @@ ERR:
     Goal* g = gNavigation->getOpponentGoal();
     if(g == nullptr) return -1;
 
-    //Motion::setPositionTarget(gNavigation->getGoalShootPosition(g));
-    Motion::setAimTarget(g->getTransform()->getPosition());
+    //gMotion->setPositionTarget(gNavigation->getGoalShootPosition(g));
+    gMotion->setAimTarget(g->getTransform()->getPosition());
     //std::cout << g->getTransform()->getPosition().toString() << std::endl;;
 ;
-    //if(fabs(Motion::getDeltaOrientation()) < 0.030) mb->releaseCoil();
+    //if(fabs(gMotion->getDeltaOrientation()) < 0.030) mb->releaseCoil();
 
-    if(!Motion::isTargetAchieved()) {
-      if(!Motion::isRunning()) Motion::start();
+    if(!gMotion->isTargetAchieved()) {
+      if(!gMotion->isRunning()) gMotion->start();
     } else {
+<<<<<<< HEAD
       Motion::stop();
 
+=======
+      gMotion->stop();
+>>>>>>> 7ee32be58a4f60230aa6cf78d6c180b1ae4830e5
       if(mb->getBallSensorState()) mb->releaseCoil();
 
     }
@@ -407,18 +402,16 @@ ERR:
 
   // Defend goal
   void LSGoalee::init() {
-    Motion::stop();
-    Motion::setBehaviour(Motion::MOT_COMPLEX);
+    gMotion->stop();
   }
 
   int LSGoalee::run() {
     Ball* b = gNavigation->getNearestBall();
 
     if(b != nullptr) {
-      Vec2i pos = gNavigation->calcBallPickupPos(b->getTransform()).getPosition();
+      vec2i pos = gNavigation->calcBallPickupPos(b->getTransform()).getPosition();
 
-      Motion::setPositionTarget(pos);
-      Motion::setAimTarget(b->getTransform()->getPosition());
+      gMotion->setTarget(pos, b->getTransform()->getPosition());
 
       Transform* t = Localization::getTransform();
       double d = t->distanceTo(b->getTransform()->getPosition());
@@ -427,11 +420,11 @@ ERR:
       //if(d < 250) mb->startDribbler();
       //else mb->stopDribbler();
 
-      if(!Motion::isTargetAchieved()) {
-        if(!Motion::isRunning()) Motion::start();
+      if(!gMotion->isTargetAchieved()) {
+        if(!gMotion->isRunning()) gMotion->start();
       }
     } else {
-      Motion::stop();
+      gMotion->stop();
     }
 
     return 0;
@@ -447,7 +440,7 @@ ERR:
   }
 
   void LSAllyFind::init() {
-    Motion::stop();
+    gMotion->stop();
     twitchScanner.init(10, 30);
   }
 
@@ -458,10 +451,10 @@ ERR:
 
     return 0;
 OK:
-    Motion::stop();
+    gMotion->stop();
     return 1;
 ERR:
-    Motion::stop();
+    gMotion->stop();
     return -1;
   }
 
@@ -472,7 +465,7 @@ ERR:
   }
 
   void LSAllyLocate::init() {
-    Motion::stop();
+    gMotion->stop();
     twitchScanner.init(10, 30);
   }
 
@@ -483,10 +476,10 @@ ERR:
 
     return 0;
 OK:
-    Motion::stop();
+    gMotion->stop();
     return 1;
 ERR:
-    Motion::stop();
+    gMotion->stop();
     return -1;
   }
 
@@ -496,28 +489,28 @@ ERR:
   }
 
   void LSAllyAim::init() {
-    Motion::stop();
+    gMotion->stop();
   }
 
   int LSAllyAim::run() {
     if(gNavigation->getAlly() == nullptr) goto ERR;
 
-    Motion::setAimTarget(gNavigation->getAlly()->getTransform()->getPosition());
-    if(!Motion::isRunning()) Motion::start();
+    gMotion->setAimTarget(gNavigation->getAlly()->getTransform()->getPosition());
+    if(!gMotion->isRunning()) gMotion->start();
 
     return 0;
 OK:
-    Motion::stop();
+    gMotion->stop();
     return 1;
 ERR:
-    Motion::stop();
+    gMotion->stop();
     return -1;
   }
 
 
   // Pass ball to ally
   void LSAllyPass::init() {
-    Motion::stop();
+    gMotion->stop();
     commTimeout.setPeriod(5000);
     finish = false;
   }
@@ -540,7 +533,7 @@ ERR:
       if(comm::pollResponse(tms.id)) {
         tms = comm::popResponse(tms.id);
         finish = true;
-              Motion::stop();
+              gMotion->stop();
 
         MainBoard* mb = hal::hw.getMainBoard();
         mb->stopDribbler();
@@ -564,7 +557,7 @@ ERR:
 
   // Receive ball from ally
   void LSAllyReceive::init() {
-    Motion::stop();
+    gMotion->stop();
     finish = false;
 
     auto cb = std::bind1st(std::mem_fun(&LSAllyReceive::onPassSignal), this);
