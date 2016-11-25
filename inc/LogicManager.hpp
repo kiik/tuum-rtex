@@ -26,8 +26,10 @@ namespace tuum {
 
     static STM* placedBall();
     static STM* enemyKikcoff();
+    static STM* enemyKikcoffPrepare();
+    static STM* throwinPrepare();
 
-    static STM* moveToBall();
+    static STM* stmPlaceholder();
   };
 
 }

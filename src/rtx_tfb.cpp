@@ -184,7 +184,7 @@ namespace tuum { namespace TFBLogic {
 
         if(role == "Goalee")
         {
-          logicProcess = LogicManager::moveToBall();
+          logicProcess = LogicManager::throwinPrepare();
         }
         else
         {

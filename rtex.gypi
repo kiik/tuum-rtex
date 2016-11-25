@@ -32,5 +32,4 @@
     'src/protocol/rtex_VisionProtocol.cpp',
     'src/protocol/rtex_HardwareProtocol.cpp',
   ],
-
 }

@@ -70,6 +70,58 @@ namespace tuum { namespace ctl {
 
   hal::MainBoard* mb = hal::hw.getMainBoard();
 
+  // Ball search
+  void LSPlaceholder::init() {
+    mTmr.start(1000);
+
+    RefereeListener* ref = hal::hw.getRefListener();
+
+    /*ref->registerCallback(REF_KICKOFF, [this](RefCommand rcmd){
+      this->kickOff();
+    });*/
+
+  }
+
+  /*void LSPlaceholder::deinit() {
+    RefereeListener* ref = hal::hw.getRefListener();
+
+    ref->deregisterCallback(REF_KICKOFF, [this](RefCommand rcmd){
+      this->kickOff();
+    });
+  }*/
+
+  /*void kickOff() {
+    mDoKickoff = true;
+  }*/
+
+
+  int LSPlaceholder::run() {
+    if(!mDoKickoff) return 0;
+
+    if(display_name) {
+      printf("%s\n", mName.c_str());
+      display_name = false;
+
+    }
+
+    if(!mTmr.isTime()) {
+      hal::hw.getMotorControl()->omniDrive(mSpeed, mRad, mDeg);
+    } else {
+      hal::hw.getMotorControl()->omniDrive(0, 0, 0);
+    }
+
+    return 0;
+  }
+
+  bool LSPlaceholder::isRunnable() {
+    return true;
+  }
+
+
+  bool LSPlaceholder::isInterruptable() {
+    return true;
+  }
+
 
   // Warmup
   bool LSInit::isRunnable() {
@@ -596,5 +648,34 @@ ERR:
   }
 
   //void scanForBallMovement
+
+  void LSMoveToEntity::init() {
+    //Scan for entity
+  }
+
+  int LSMoveToEntity::run(){
+
+    /*if(e != nullptr) {
+      Vec2i pos = gNavigation->calcPerimeterPosition(e->getTransform(), d).getPosition();
+
+      Motion::setPositionTarget(pos);
+      Motion::setAimTarget(e->getTransform()->getPosition());
+
+      Transform* t = Localization::getTransform();
+      double currentDistance = t->distanceTo(e->getTransform()->getPosition());
+
+      if(currentDistance > d) {
+        if(!Motion::isRunning()){
+           Motion::start();
+      } else {
+        Motion::stop();
+      }
+    } else {
+      Motion::stop();
+    }
+  }*/
+
+    return 1;
+  }
 
 }}

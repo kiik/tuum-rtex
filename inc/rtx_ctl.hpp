@@ -306,12 +306,33 @@ namespace tuum { namespace ctl {
 
     void init();
     int run();
-    bool isRunnable();
+    //bool isRunnable();
 
   private:
     Timer kickoffTimer;
     Context ctx;
     bool gameStarted = false;
+    bool ballMoved = false;
+  };
+
+  class LSMoveToEntity : public Controller{
+  public:
+    LSMoveToEntity(Context _ctx, Entity* entity, double distance) {
+      ctx = _ctx;
+      e = entity;
+      d = distance;
+    }
+
+    void init();
+    int run();
+    //bool isRunnable();
+
+  private:
+    Entity* e;
+    double d;
+    bool gameStarted = false;
+    bool ballMoved = false;
+    Context ctx;
   };
 
 }}
