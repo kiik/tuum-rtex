@@ -582,7 +582,7 @@ ERR:
   }
 
   void LSPlacedBallInit::init() {
-    Motion::stop();
+    gMotion->stop();
   }
 
   int LSPlacedBallInit::run() {
@@ -616,7 +616,7 @@ ERR:
   }
 
   void LSWaitForEnemyKickoff::init(){
-    Motion::stop();
+    gMotion->stop();
     kickoffTimer.setPeriod(5000);
   }
 

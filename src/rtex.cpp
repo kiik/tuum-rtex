@@ -5,6 +5,9 @@
 #include "STM.hpp"
 #include "rtx_ctl.hpp"
 
+#include "tuum_motion.hpp"
+#include "tuum_context.hpp"
+
 using namespace tuum;
 
 namespace rtex {
@@ -12,33 +15,11 @@ namespace rtex {
   STM* stm;
 
   void setup() {
-    stm = new STM();
-    State* st, *st2;
-    Context ctx;
-
-    st = stm->createState("STInit");
-    stm->setState(st);
-    ctx.st = st;
-    st->addController(new ctl::LSInit(ctx));
-
-    st2 = stm->createState("STBallLocate");
-    st->setNextState(st2);
-    st = st2;
-    ctx.st = st;
-    st->addController(new ctl::LSBallLocate(ctx));
-
-    st2 = stm->createState("STBallNavigator");
-    st2->setLastState(st);
-    st->setNextState(st2);
-    st = st2;
-    ctx.st = st;
-    st->addController(new ctl::LSBallNavigator(ctx));
-
-    stm->setup();
+    tuum::gMotion->setAimTarget({10, 10});
   }
 
   void process() {
-    stm->process();
+
   }
 
 }
