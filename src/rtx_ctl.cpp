@@ -101,7 +101,7 @@ namespace tuum { namespace ctl {
   }
 
   int LSBallLocate::run() {
-    if(gNavigation->countValidBalls() > 0) {
+    if(gNavi->countValidBalls() > 0) {
       mb->startDribbler();
       gMotion->stop();
       return 0;
@@ -121,7 +121,7 @@ namespace tuum { namespace ctl {
   void LSBallNavigator::init() {
     gMotion->stop();
 
-    Ball* b = gNavigation->getNearestBall();
+    Ball* b = gNavi->getNearestBall();
     if(b != nullptr)
       std::cout << "Navigate to " << b->toString() << std::endl;
   }
@@ -129,12 +129,12 @@ namespace tuum { namespace ctl {
   int LSBallNavigator::run() {
     Ball* b = nullptr;
     if(mb->getBallSensorState()) goto OK;
-    if(gNavigation->countValidBalls() <= 0) goto ERR;
+    if(gNavi->countValidBalls() <= 0) goto ERR;
 
-    b = gNavigation->getNearestBall();
+    b = gNavi->getNearestBall();
 
     if(b != nullptr) {
-      vec2i pos = gNavigation->calcBallPickupPos(b->getTransform()).getPosition();
+      vec2i pos = gNavi->calcBallPickupPos(b->getTransform()).getPosition();
 
       gMotion->setTarget(pos, b->getTransform()->getPosition());
       mb->startDribbler();
@@ -162,7 +162,7 @@ ERR:
   }
 
   bool LSBallNavigator::isRunnable() {
-    return gNavigation->countValidBalls() > 0 || mb->getBallSensorState();
+    return gNavi->countValidBalls() > 0 || mb->getBallSensorState();
   }
 
 
@@ -175,9 +175,9 @@ ERR:
   int LSBallPicker::run() {
     Ball* b = nullptr;
     if(mb->getBallSensorState()) goto OK;
-    if(gNavigation->countValidBalls() <= 0) goto ERR;
+    if(gNavi->countValidBalls() <= 0) goto ERR;
 
-    b = gNavigation->getNearestBall();
+    b = gNavi->getNearestBall();
 
     if(b != nullptr) {
       double dD = Motion::DribblerPlanePadding;
@@ -207,7 +207,7 @@ ERR:
   bool LSBallPicker::isRunnable() {
     if(mb->getBallSensorState()) return true;
 
-    Ball* b = gNavigation->getNearestBall();
+    Ball* b = gNavi->getNearestBall();
     if(b == nullptr) return false;
 
     Transform* t = Localization::getTransform();
@@ -236,7 +236,7 @@ ERR:
 
   int LSGoalLocate::run() {
     if(!mb->getBallSensorState()) goto ERR;
-    if(gNavigation->getOpponentGoal() != nullptr) goto OK;
+    if(gNavi->getOpponentGoal() != nullptr) goto OK;
 
     twitchScanner.run();
 
@@ -258,7 +258,7 @@ ERR:
   }
 
   int LSAllyGoalLocate::run() {
-    if(gNavigation->getAllyGoal() != nullptr) return 1;
+    if(gNavi->getAllyGoal() != nullptr) return 1;
 
     twitchScanner.run();
 
@@ -268,7 +268,7 @@ ERR:
   void LSAllyGoalMove::init() {
     gMotion->stop();
 
-    Goal* goal = gNavigation->getAllyGoal();
+    Goal* goal = gNavi->getAllyGoal();
     if(goal != nullptr)
       std::cout << "Navigate to " << goal->toString() << std::endl;
   }
@@ -279,7 +279,7 @@ ERR:
     //if(väravat ei leitud) goto ERR;
 
     if(goal != nullptr) {
-      vec2i pos = gNavigation->calcAllyGoalPos(goal->getTransform()).getPosition();
+      vec2i pos = gNavi->calcAllyGoalPos(goal->getTransform()).getPosition();
 
       gMotion->setTarget(pos, goal->getTransform()->getPosition());
 
@@ -319,10 +319,10 @@ ERR:
   int LSGoalShoot::run() {
     if(!mb->getBallSensorState()) return -1;
 
-    Goal* g = gNavigation->getOpponentGoal();
+    Goal* g = gNavi->getOpponentGoal();
     if(g == nullptr) return -1;
 
-    //gMotion->setPositionTarget(gNavigation->getGoalShootPosition(g));
+    //gMotion->setPositionTarget(gNavi->getGoalShootPosition(g));
     gMotion->setAimTarget(g->getTransform()->getPosition());
     //std::cout << g->getTransform()->getPosition().toString() << std::endl;;
 ;
@@ -339,7 +339,7 @@ ERR:
   }
 
   bool LSGoalShoot::isRunnable() {
-    return gNavigation->getOpponentGoal() != nullptr && mb->getBallSensorState();
+    return gNavi->getOpponentGoal() != nullptr && mb->getBallSensorState();
   }
 
   // Defend goal
@@ -348,10 +348,10 @@ ERR:
   }
 
   int LSGoalee::run() {
-    Ball* b = gNavigation->getNearestBall();
+    Ball* b = gNavi->getNearestBall();
 
     if(b != nullptr) {
-      vec2i pos = gNavigation->calcBallPickupPos(b->getTransform()).getPosition();
+      vec2i pos = gNavi->calcBallPickupPos(b->getTransform()).getPosition();
 
       gMotion->setTarget(pos, b->getTransform()->getPosition());
 
@@ -387,7 +387,7 @@ ERR:
   }
 
   int LSAllyFind::run() {
-    if(gNavigation->getAlly() != nullptr) goto OK;
+    if(gNavi->getAlly() != nullptr) goto OK;
 
     twitchScanner.run();
 
@@ -412,7 +412,7 @@ ERR:
   }
 
   int LSAllyLocate::run() {
-    if(gNavigation->getAlly() != nullptr) goto OK;
+    if(gNavi->getAlly() != nullptr) goto OK;
 
     twitchScanner.run();
 
@@ -427,7 +427,7 @@ ERR:
 
 
   bool LSAllyAim::isRunnable() {
-    return gNavigation->getAlly() != nullptr;
+    return gNavi->getAlly() != nullptr;
   }
 
   void LSAllyAim::init() {
@@ -435,9 +435,9 @@ ERR:
   }
 
   int LSAllyAim::run() {
-    if(gNavigation->getAlly() == nullptr) goto ERR;
+    if(gNavi->getAlly() == nullptr) goto ERR;
 
-    gMotion->setAimTarget(gNavigation->getAlly()->getTransform()->getPosition());
+    gMotion->setAimTarget(gNavi->getAlly()->getTransform()->getPosition());
     if(!gMotion->isRunning()) gMotion->start();
 
     return 0;
@@ -490,7 +490,7 @@ ERR:
   bool LSAllyPass::isRunnable() {
     if(finish) return true;
 
-    if(gNavigation->getAlly() == nullptr) return false;
+    if(gNavi->getAlly() == nullptr) return false;
     if(!mb->getBallSensorState()) return false;
     return true;
   }
