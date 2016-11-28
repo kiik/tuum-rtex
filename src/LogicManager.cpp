@@ -184,7 +184,7 @@ namespace tuum {
     st->setNextState(st2);
     st = st2;
     ctx.st = st;
-    st->addController(new ctl::LSMoveToEntity(ctx, gNavigation->getAllyGoal(), 100));
+    st->addController(new ctl::LSMoveToEntity(ctx, gNavi->getAllyGoal(), 100));
 
     st2 = stm->createState("STGoalee");
     stm->setState(st);
