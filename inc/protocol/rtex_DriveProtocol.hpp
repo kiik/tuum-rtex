@@ -19,6 +19,8 @@ namespace tuum {
 
     int drive(json);
 
+    int getInfo(const json&);
+
   private:
 
   };
