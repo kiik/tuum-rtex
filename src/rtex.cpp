@@ -34,11 +34,11 @@ namespace rtex {
     ctx.st = st;
     st->addController(new ctl::LSBallNavigator(ctx));
 
-    stm->setup();
+    //stm->setup();
   }
 
   void process() {
-    stm->process();
+    //stm->process();
   }
 
 }
