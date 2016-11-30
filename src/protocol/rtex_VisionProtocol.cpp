@@ -49,7 +49,7 @@ namespace tuum {
 
       }
     } else if(cmd == "pplcnf") {
-      return pplConfig(m.dat[JS_DATA]);
+      return vConfig(m.dat);
     } else if(boost::starts_with(cmd, "vf_")) {
       return vFilter(m.dat);
     } else if(cmd == "ent_get") {
@@ -93,8 +93,14 @@ namespace tuum {
     return 0;
   }
 
-  int VisionProtocol::pplConfig(const json& dat) {
-    tuum::gVision->pplConfig(dat);
+  int VisionProtocol::vConfig(const json& dat) {
+    if(dat.find("data") != dat.end())
+      tuum::gVision->configure(dat["data"]);
+
+    json out;
+    tuum::gVision->toJSON(out);
+    send(out);
+
     return 0;
   }
 
