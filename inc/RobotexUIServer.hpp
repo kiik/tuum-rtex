@@ -8,8 +8,8 @@
 
 #include "WebSocketServer.hpp"
 
+#include "protocol/tuum_VisionProtocol.hpp"
 #include "protocol/rtex_DriveProtocol.hpp"
-#include "protocol/rtex_VisionProtocol.hpp"
 #include "protocol/rtex_HardwareProtocol.hpp"
 
 using namespace tuum::wsocs;
