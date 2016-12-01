@@ -27,7 +27,10 @@ namespace tuum {
     wait_for_vision = true;
 
     motionTimer.setPeriod(160);
-    visionTimer.setPeriod(400);
+    visionTimer.setPeriod(600);
+
+    motionTimer.start();
+    visionTimer.start();
   }
 
   void TwitchScan::init() {
@@ -43,17 +46,13 @@ namespace tuum {
   void TwitchScan::run() {
     if(!wait_for_vision) {
       if(motionTimer.isTime()) {
-        gMotion->setAimTarget(vec2i({0, 1}));
-        //motionData.manualRotGear = {m_spv, 3.14};
-        gMotion->start();
+        gMotion->setTarget(2.0);
         wait_for_vision = true;
         visionTimer.start();
       }
     } else {
       if(visionTimer.isTime()) {
-        gMotion->setAimTarget(vec2i({0, 1}));
-        //motionData.manualRotGear = {m_sps, 3.14};
-        gMotion->start();
+        gMotion->setTarget(0.50);
         wait_for_vision = false;
         motionTimer.start();
       }
@@ -102,7 +101,7 @@ namespace tuum { namespace ctl {
 
   int LSBallLocate::run() {
     if(gNavi->countValidBalls() > 0) {
-      mb->startDribbler();
+      //mb->startDribbler();
       gMotion->stop();
       return 0;
     } else {
@@ -134,14 +133,11 @@ namespace tuum { namespace ctl {
     b = gNavi->getNearestBall();
 
     if(b != nullptr) {
-      vec2i pos = gNavi->calcBallPickupPos(b->getTransform()).getPosition();
+      auto bt = b->getTransform();
+      vec2i pos = gNavi->calcBallPickupPos(bt).getPosition();
 
       gMotion->setTarget(pos, b->getTransform()->getPosition());
-      mb->startDribbler();
-
-      //std::cout << d << std::endl;
-      //if(d < 250) mb->startDribbler();
-      //else mb->stopDribbler();
+      //mb->startDribbler();
 
       if(!gMotion->isTargetAchieved()) {
         if(!gMotion->isRunning()) gMotion->start();
@@ -322,17 +318,13 @@ ERR:
     Goal* g = gNavi->getOpponentGoal();
     if(g == nullptr) return -1;
 
-    //gMotion->setPositionTarget(gNavi->getGoalShootPosition(g));
     gMotion->setAimTarget(g->getTransform()->getPosition());
-    //std::cout << g->getTransform()->getPosition().toString() << std::endl;;
-;
-    //if(fabs(gMotion->getDeltaOrientation()) < 0.030) mb->releaseCoil();
 
     if(!gMotion->isTargetAchieved()) {
       if(!gMotion->isRunning()) gMotion->start();
     } else {
       gMotion->stop();
-      if(mb->getBallSensorState()) mb->releaseCoil();
+      if(mb->getBallSensorState()) mb->coilKick();
     }
 
     return 0;
