@@ -12,6 +12,8 @@
 
 #include "tuum_navigation.hpp"
 
+#include "tuum_context.hpp"
+
 namespace tuum {
 
   /**
@@ -214,7 +216,7 @@ namespace tuum {
     st->setNextState(st2);
     st = st2;
     ctx.st = st;
-    st ->addController(new ctl::LSMoveToEntity(ctx, gNavigation->getNearestBall(), 500));
+    st ->addController(new ctl::LSMoveToEntity(ctx, gNavi->getNearestBall(), 500));
 
     std::cout << "State placed ball" << std::endl;
 
@@ -230,7 +232,7 @@ namespace tuum {
     st = stm -> createState("STMoveToBall");
     stm->setState(st);
     ctx.st = st;
-    st ->addController(new ctl::LSMoveToEntity(ctx, gNavigation->getNearestBall(), 1000));
+    st ->addController(new ctl::LSMoveToEntity(ctx, gNavi->getNearestBall(), 1000));
 
     return stm;
   }
@@ -320,7 +322,7 @@ namespace tuum {
     st = stm -> createState("STMoveToBall");
     stm->setState(st);
     ctx.st = st;
-    st ->addController(new ctl::LSMoveToEntity(ctx, gNavigation->getNearestBall(), 500));
+    st ->addController(new ctl::LSMoveToEntity(ctx, gNavi->getNearestBall(), 500));
 
     return stm;
   }
