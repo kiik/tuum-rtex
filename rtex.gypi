@@ -23,12 +23,13 @@
     'src/rtx_cmds.cpp',
 
     'src/rtex_init.cpp',
+    'src/rtex.cpp',
 
     'src/LogicManager.cpp',
     'src/RobotexUIServer.cpp',
 
     'src/protocol/rtex_DriveProtocol.cpp',
-    'src/protocol/rtex_VisionProtocol.cpp',
+    'src/protocol/rtex_HardwareProtocol.cpp',
   ],
 
 }

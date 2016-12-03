@@ -17,6 +17,7 @@ namespace tuum { namespace gui {
 
     size_t id = proto()->add(mDrvProtocol.getDescriptor());
     id = proto()->add(mVisProtocol.getDescriptor());
+    id = proto()->add(mHwProtocol.getDescriptor());
   }
 
   void RobotexUIServer::onGet()
