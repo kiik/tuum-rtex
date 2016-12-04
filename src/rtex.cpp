@@ -6,6 +6,7 @@
 #include "STM.hpp"
 #include "rtx_ctl.hpp"
 #include "LogicManager.hpp"
+#include "rtx_fb.hpp"
 
 #include "tuum_motion.hpp"
 #include "tuum_context.hpp"
@@ -32,16 +33,25 @@ namespace rtex {
 
   void setup() {
 
-    hal::hw.getMainBoard()->startDribbler(0.1);
+    //hal::hw.getMainBoard()->startDribbler(0.1);
 
-    stm = LogicManager::loadOffensivePlay();//new STM();
+    //stm = LogicManager::loadOffensivePlay();//new STM();
 
-    stm->setup();
+    //stm->setup();
     debugTmr.start(2000);
+    FBLogic::setup();
   }
 
+  bool dbg = false;
+
   void process() {
-    stm->process();
+    if(!dbg) {
+      dbg = true;
+      hal::hw.getMotorControl()->omniDrive(0, 0, 0);
+    }
+
+    //stm->process();
+    FBLogic::process();
 
     if(debugTmr.isTime()) {
       //gMotion->debug();
