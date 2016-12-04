@@ -32,13 +32,13 @@ namespace rtex {
   Timer debugTmr;
 
   void setup() {
+    debugTmr.start(2000);
 
     //hal::hw.getMainBoard()->startDribbler(0.1);
 
     //stm = LogicManager::loadOffensivePlay();//new STM();
 
     //stm->setup();
-    debugTmr.start(2000);
     FBLogic::setup();
   }
 
