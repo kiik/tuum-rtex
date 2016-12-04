@@ -220,7 +220,7 @@ ERR:
   void LSBallPicker::init() {
     gMotion->stop();
     mb->stopDribbler();
-    mb->chargeCoil();
+    mb->coilCharge();
     if(!mb->getDribblerState()) mb->startDribbler(0.4);
   }
 
