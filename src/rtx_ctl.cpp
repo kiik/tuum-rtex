@@ -13,6 +13,7 @@
 #include "tuum_navigation.hpp"
 #include "tuum_motion.hpp"
 #include "tuum_context.hpp"
+#include "MainBoard.hpp"
 
 #include "hal.hpp"
 
@@ -148,7 +149,7 @@ namespace tuum { namespace ctl {
   void LSBallLocate::init() {
     gMotion->stop();
     twitchScanner.init(5, 30);
-    mb->stopDribbler();
+    //mb->stopDribbler();
   }
 
   int LSBallLocate::run() {
@@ -217,7 +218,9 @@ ERR:
   // Ball pickup
   void LSBallPicker::init() {
     gMotion->stop();
-    mb->startDribbler();
+    mb->stopDribbler();
+    mb->chargeCoil();
+    if(!mb->getDribblerState()) mb->startDribbler(0.4);
   }
 
   int LSBallPicker::run() {
@@ -236,7 +239,7 @@ ERR:
 
       if(me->getPosition().distanceTo(t->getPosition()) > dD) return -1;
 
-      mb->startDribbler();
+      if(!mb->getDribblerState()) mb->startDribbler(0.4);
       if(!gMotion->isRunning()) gMotion->start();
     } else {
       gMotion->stop();
@@ -248,7 +251,7 @@ OK:
     return 1;
 ERR:
     gMotion->stop();
-    mb->stopDribbler();
+    //mb->stopDribbler();
     return -1;
   }
 
@@ -269,7 +272,7 @@ ERR:
   // Opposing goal search
   bool LSGoalLocate::isRunnable() {
     if(mb->getBallSensorState()) {
-      mb->startDribbler();
+      if(!mb->getDribblerState()) mb->startDribbler(0.4);
       return true;
     }
     return false;
@@ -279,7 +282,7 @@ ERR:
     gMotion->stop();
     ctx.phase = CP_INIT;
     twitchScanner.init(10, 30);
-    mb->startDribbler();
+    if(!mb->getDribblerState()) mb->startDribbler(0.4);
   }
 
   int LSGoalLocate::run() {
@@ -505,7 +508,7 @@ ERR:
     if(finish) return 0;
 
     if(mb->getBallSensorState()) {
-      mb->startDribbler();
+      if(!mb->getDribblerState()) mb->startDribbler(0.4);
     } else {
       //FIXME: Ball lost Tuum signal?
       return -1;
@@ -522,7 +525,7 @@ ERR:
               gMotion->stop();
 
         MainBoard* mb = hal::hw.getMainBoard();
-        mb->stopDribbler();
+        //mb->stopDribbler();
 
         mb->releaseCoil(); //TODO: Weak kick
 

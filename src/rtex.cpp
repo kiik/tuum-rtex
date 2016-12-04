@@ -14,6 +14,7 @@
 #include "tuum_localization.hpp"
 #include "tuum_navigation.hpp"
 #include "tuum_motion.hpp"
+#include "MainBoard.hpp"
 #include "tuum_context.hpp"
 
 #include "hal.hpp"
@@ -31,6 +32,8 @@ namespace rtex {
 
   void setup() {
 
+    hal::hw.getMainBoard()->startDribbler(0.1);
+
     stm = LogicManager::loadOffensivePlay();//new STM();
 
     stm->setup();
@@ -38,7 +41,7 @@ namespace rtex {
   }
 
   void process() {
-    //stm->process();
+    stm->process();
 
     if(debugTmr.isTime()) {
       //gMotion->debug();
