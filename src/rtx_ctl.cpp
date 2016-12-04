@@ -149,7 +149,8 @@ namespace tuum { namespace ctl {
   void LSBallLocate::init() {
     gMotion->stop();
     twitchScanner.init(5, 30);
-    //mb->stopDribbler();
+    mb->stopDribbler();
+    mb->coilCharge();
   }
 
   int LSBallLocate::run() {
