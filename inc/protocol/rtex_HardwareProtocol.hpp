@@ -27,8 +27,6 @@ namespace tuum {
 
     HardwareProtocol();
 
-    WSProtocol::route_t getDescriptor();
-
     int route(const WSProtocol::Message&);
 
     int setDribbler(const json&);

@@ -3,6 +3,7 @@
 
 #include "tuum_motion.hpp"
 #include "tuum_context.hpp"
+#include "tuum_system.hpp"
 
 #include "protocol/rtex_DriveProtocol.hpp"
 
@@ -10,26 +11,40 @@ using namespace tuum::wsocs;
 
 namespace tuum {
 
-  DriveProtocol::DriveProtocol() {
+  DriveProtocol::DriveProtocol():
+    WSProtocol({
+      "Drive Protocol",
+      "/drv",
+      "0.0.1-al.0",
+      {
+        {"Omni Drive", "/omni", {
+            {"MotorPower", "mp", WSType::WST_Integer},
+            {"Motor Valve", "mv", WSType::WST_Integer},
+            {"Joint Valve", "jv", WSType::WST_Integer},
+          }
+        },
+        {"Drive Signal", "/drvsig", {
+            {"Signal Name", "s", WSType::WST_String},
+          }
+        },
+        {"Get Drive Feedback", "/fb", {}},
 
-  }
-
-  WSProtocol::route_t DriveProtocol::getDescriptor()
+        {"Get Control Mode", "/ctlm.get", {}},
+        {"Set Control Mode", "/ctlm.set", {
+          {"Control Mode", "ctlm", WSType::WST_String}
+        }}
+      },
+      this
+    })
   {
-    WSProtocol::route_t out;
-    out.uri = "/drv";
-    out.wsp = this;
-    return out;
+
   }
 
   int DriveProtocol::route(const WSProtocol::Message& m) {
-    std::string cmd = m.dat[WSProtocol::JS_CMD];
+    std::string uri = m.dat[WSProtocol::JS_URI];
 
-    if(cmd == "drv") {
-      return drive(m.dat);
-    } else if(cmd == "info") {
-      return getInfo(m.dat);
-    }
+    if(uri == "/omni") return drive(m.dat);
+    if(uri == "/fb") return getInfo(m.dat);
 
     return -1;
   }
@@ -41,7 +56,14 @@ namespace tuum {
 
   int DriveProtocol::getInfo(const json& dat) {
     json out;
-    tuum::gMotion->toJSON(out);
+
+    tuum::Motion *ptr = nullptr; // (Motion*)tuum::gSystem->findSubsystem(tuum::Motion::GetType());
+
+    if(ptr != nullptr)
+    {
+      ptr->toJSON(out);
+    }
+
     send(out);
   }
 

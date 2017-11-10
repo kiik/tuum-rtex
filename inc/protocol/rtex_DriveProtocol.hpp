@@ -13,8 +13,6 @@ namespace tuum {
   public:
     DriveProtocol();
 
-    WSProtocol::route_t getDescriptor();
-
     int route(const WSProtocol::Message&);
 
     int drive(json);

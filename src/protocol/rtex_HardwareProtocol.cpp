@@ -8,25 +8,33 @@ using namespace tuum::wsocs;
 
 namespace tuum {
 
-  HardwareProtocol::HardwareProtocol() {
-    mRouteMap["dr"] = ERoute::SetDribbler;
-    mRouteMap["ch"] = ERoute::DoCoilCharge;
-    mRouteMap["kc"] = ERoute::DoCoilKick;
-    mRouteMap["bl"] = ERoute::GetBallSensor;
-  }
-
-  WSProtocol::route_t HardwareProtocol::getDescriptor()
+  HardwareProtocol::HardwareProtocol():
+    WSProtocol({
+      "Hardware Protocol",
+      "/hw",
+      "0.0.1-al.0",
+      {
+        {"Set Dribbler", "/dr", {
+            {"Power", "v", WSType::WST_Integer},
+          }
+        },
+        {"Coil Charge", "/ch", {}},
+        {"Coil Kick", "/kc", {}},
+        {"Get Ball Sensor", "/bl", {}},
+      },
+      this
+    })
   {
-    WSProtocol::route_t out;
-    out.uri = "/hw";
-    out.wsp = this;
-    return out;
+    mRouteMap["/dr"] = ERoute::SetDribbler;
+    mRouteMap["/ch"] = ERoute::DoCoilCharge;
+    mRouteMap["/kc"] = ERoute::DoCoilKick;
+    mRouteMap["/bl"] = ERoute::GetBallSensor;
   }
 
   int HardwareProtocol::route(const WSProtocol::Message& m) {
     ERoute r = ERoute::None;
     for(auto it = mRouteMap.begin(); it != mRouteMap.end(); it++) {
-      if(it->first == m.dat[WSProtocol::JS_CMD]) {
+      if(it->first == m.dat[WSProtocol::JS_URI]) {
         r = it->second;
         break;
       }
