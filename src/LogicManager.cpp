@@ -10,6 +10,10 @@
 
 #include "LogicManager.hpp"
 
+#include "tuum_navigator.hpp"
+
+#include "tuum_context.hpp"
+
 namespace tuum {
 
   /**
@@ -182,7 +186,7 @@ namespace tuum {
     st->setNextState(st2);
     st = st2;
     ctx.st = st;
-    st->addController(new ctl::LSAllyGoalMove(ctx));
+    st->addController(new ctl::LSMoveToEntity(ctx, nullptr, 100)); // FIXME: gNavi->getAllyGoal()
 
     st2 = stm->createState("STGoalee");
     stm->setState(st);
@@ -207,18 +211,28 @@ namespace tuum {
     st->addController(new ctl::LSBallLocate(ctx));
 
 
-    st2 = stm->createState("STPlacedBallInit");
+    st2 = stm -> createState("STMoveToBall");
     st2->setLastState(st);
     st->setNextState(st2);
     st = st2;
     ctx.st = st;
-    st->addController(new ctl::LSPlacedBallInit(ctx));
+    //st->addController(new ctl::LSMoveToEntity(ctx, gNavi->getNearestBall(), 500));
 
-    if (false)
-    {
-      stm = loadOffensivePlay();
-    }
     std::cout << "State placed ball" << std::endl;
+
+    return stm;
+  }
+
+  STM* LogicManager::enemyKikcoffPrepare()
+  {
+    STM* stm = new STM();
+    State* st, *st2;
+    Context ctx;
+
+    st = stm -> createState("STMoveToBall");
+    stm->setState(st);
+    ctx.st = st;
+    //st->addController(new ctl::LSMoveToEntity(ctx, gNavi->getNearestBall(), 1000));
 
     return stm;
   }
@@ -229,24 +243,34 @@ namespace tuum {
     State* st, *st2;
     Context ctx;
 
+    st = stm -> createState("STWaitForEnemyKickoff");
+    stm->setState(st);
+    ctx.st = st;
+    st ->addController(new ctl::LSWaitForEnemyKickoff(ctx));
+
     //Move to centerline
 
-    /*st2 = stm-> createState("STWaitForEnemyKickoff");
+    /*st = stm-> createState("STPlaceholder");
+    //st2->setLastState(st);
+    //st->setNextState(st2);
+    //st = st2;
+    ctx.st = st;
+    st->addController(new ctl::LSPlaceholder(ctx, "LSPlaceholder#0", 10, 0, 0));
+
+
+    st2 = stm-> createState("STPlaceholder2");
     st2->setLastState(st);
     st->setNextState(st2);
     st = st2;
-    ctx.st = st
-    st->addController(new ctl::LSWaitForEnemyKickoff(ctx))*/
-
-    //offensive play
-
-    std::cout << "State enemyKikcoff" << std::endl;
+    ctx.st = st;
+    st->addController(new ctl::LSPlaceholder(ctx, "LSPlaceholder#1", 0, 0, 10));*/
 
     return stm;
   }
 
-  STM* LogicManager::moveToBall()
+  STM* LogicManager::stmPlaceholder()
   {
+    /*
     STM* stm = new STM();
     State* st, *st2;
     Context ctx;
@@ -262,9 +286,44 @@ namespace tuum {
     st->setNextState(st2);
     st = st2;
     ctx.st = st;
-    st->addController(new ctl::LSBallNavigator(ctx));
+    st->addController(new ctl::LSBallNavigator(ctx));*/
+
+    STM* stm = new STM();
+    State* st, *st2;
+    Context ctx;
+
+    //Move to centerline
+
+    st = stm-> createState("STPlaceholder");
+    //st2->setLastState(st);
+    //st->setNextState(st2);
+    //st = st2;
+    ctx.st = st;
+    st->addController(new ctl::LSPlaceholder(ctx, "LSPlaceholder#0", 0, 10, 0));
+
+
+    st2 = stm-> createState("STPlaceholder2");
+    st2->setLastState(st);
+    st->setNextState(st2);
+    st = st2;
+    ctx.st = st;
+    st->addController(new ctl::LSPlaceholder(ctx, "LSPlaceholder#1", 10, 10, 0));
 
     return stm;
 
+  }
+
+  STM* LogicManager::throwinPrepare()
+  {
+    STM* stm = new STM();
+    State* st, *st2;
+    Context ctx;
+
+    st = stm -> createState("STMoveToBall");
+    stm->setState(st);
+    ctx.st = st;
+    // st->addController(new ctl::LSMoveToEntity(ctx, gNavi->getNearestBall(), 500));
+
+    return stm;
   }
 }
