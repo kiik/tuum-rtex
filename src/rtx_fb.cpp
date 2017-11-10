@@ -46,7 +46,7 @@ namespace tuum { namespace FBLogic {
 
   void stop() {
     std::cout << "Stop game." << std::endl;
-    gMotion->stop();
+    gNav->stop();
     hw.getMainBoard()->stopDribbler();
     gmState = GameState::STOP;
   }

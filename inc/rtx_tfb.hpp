@@ -24,7 +24,7 @@ namespace tuum { namespace TFBLogic {
     GAME,
 
     KICKOFF,
-    KICKOFF_GOAL,        // Väravaesine lahtilöök
+    KICKOFF_GOAL,        // Väravaesine lahtilöök ????
 
     FREEKICK_INDIRECT,   // Vabalöök
     FREEKICK_DIRECT,     // Karistuslöök

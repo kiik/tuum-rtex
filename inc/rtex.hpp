@@ -2,14 +2,14 @@
 #define RTEX_MODULE_H
 
 #include "tuum_system.hpp"
-#include "RobotexUIServer.hpp"
+#include "RobotexCommSrv.hpp"
 
 int main(int, char*[]);
 
 namespace rtex {
 
   extern tuum::System gSys;
-  extern tuum::gui::RobotexUIServer uiSrv;
+  extern tuum::gui::RobotexCommSrv uiSrv;
 
   void setup();
   void process();

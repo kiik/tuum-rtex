@@ -1,7 +1,7 @@
 {
   'targets': [
     {
-      'target_name': 'tuum',
+      'target_name': 'tuum-agent',
       'type': 'executable',
 
       'includes': [

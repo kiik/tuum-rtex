@@ -3,21 +3,21 @@
 
 #include "tuum_platform.hpp"
 #include "tuum_context.hpp"
-#include "tuum_htgui.hpp"
+#include "tuum_comm.hpp"
 
-#include "RobotexUIServer.hpp"
+#include "RobotexCommSrv.hpp"
 
 namespace rtex {
 
   tuum::System gSys;
-  tuum::gui::RobotexUIServer uiSrv;
+  tuum::gui::RobotexCommSrv uiSrv;
 
 
   int ui_init(int argc, char* argv[]) {
-    tuum::gui::startup(argc, argv);
+    //tuum::gui::startup(argc, argv);
 
     if(uiSrv.init() < 0) return -1;
-    if(tuum::gui::register_server(&uiSrv) < 0) return -2;
+    if(tuum::wsocs::register_server(&uiSrv) < 0) return -2;
 
     return 0;
   }

@@ -43,6 +43,38 @@ namespace tuum {
 
 namespace tuum { namespace ctl {
 
+  class LSPlaceholder : public Controller {
+    public:
+      LSPlaceholder(Context _ctx, std::string n, float speed, float rad, float deg):
+        ctx(_ctx),
+        mName(n),
+        mSpeed(speed),
+        mDeg(deg),
+        mRad(rad),
+        display_name(true)
+      {
+
+      }
+
+      void init();
+      int run();
+      bool isRunnable();
+      bool isInterruptable();
+
+    private:
+      Context ctx;
+
+      float mSpeed;
+      float mDeg;
+      float mRad;
+
+      Timer mTmr;
+
+      std::string mName;
+      bool display_name;
+      bool mDoKickoff;
+  };
+
   class LSInit : public Controller {
     public:
       LSInit(Context _ctx) : ctx(_ctx) {}
@@ -264,18 +296,39 @@ namespace tuum { namespace ctl {
     Context ctx;
   };
 
-  class LSWaitForEnemyKickoff : public Controller{
+  class LSWaitForEnemyKickoff : public Controller {
   public:
     LSWaitForEnemyKickoff(Context _ctx) : ctx(_ctx) {}
 
     void init();
     int run();
-    bool isRunnable();
+    //bool isRunnable();
 
   private:
     Timer kickoffTimer;
     Context ctx;
     bool gameStarted = false;
+    bool ballMoved = false;
+  };
+
+  class LSMoveToEntity : public Controller {
+  public:
+    LSMoveToEntity(Context _ctx, Entity* entity, double distance) {
+      ctx = _ctx;
+      e = entity;
+      d = distance;
+    }
+
+    void init();
+    int run();
+    //bool isRunnable();
+
+  private:
+    Entity* e;
+    double d;
+    bool gameStarted = false;
+    bool ballMoved = false;
+    Context ctx;
   };
 
 }}
