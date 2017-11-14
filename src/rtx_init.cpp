@@ -7,6 +7,8 @@
 
 #include "core/rtx_RobotexCommSrv.hpp"
 
+#include "rtx_goal_detect.hpp"
+
 namespace rtx {
 
   tuum::System gSys;
@@ -22,6 +24,8 @@ namespace rtx {
 }
 
 int main(int argc, char* argv[]) {
+  // return rtx_goal_detection_main(argc, argv);
+
   tuum::setGlobalSystem(&(rtx::gSys));
 
   if(tuum::init(argc, argv) < 0) return -1;

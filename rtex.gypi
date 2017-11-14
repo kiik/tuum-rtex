@@ -12,11 +12,17 @@
 
  'cflags': [
     '--std=c++11',
+    '<!@(pkg-config --cflags aruco)',
+  ],
+  'libraries': [
+    '<!@(pkg-config --libs aruco)',
   ],
   'include_dirs': [
-    'inc',
+    'inc'
   ],
   'sources': [
+    'src/rtx_goal_detect.cpp',
+
     'src/rtx_ctl.cpp',
     'src/rtx_cmd.cpp',
     'src/rtx_init.cpp',
