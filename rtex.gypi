@@ -11,27 +11,27 @@
   ],
 
  'cflags': [
-    '--std=c++11'
+    '--std=c++11',
   ],
   'include_dirs': [
-    'inc'
+    'inc',
   ],
   'sources': [
     'src/rtx_ctl.cpp',
-    'src/rtx_fb.cpp',
-    'src/rtx_tfb.cpp',
-    'src/rtx_cmds.cpp',
-    'src/rtx_context.cpp',
+    'src/rtx_cmd.cpp',
+    'src/rtx_init.cpp',
+    'src/robotex.cpp',
 
-    'src/rtex_init.cpp',
-    'src/rtex.cpp',
+    'src/game/rtx_football.cpp',
+    'src/game/rtx_team_football.cpp',
+    'src/game/rtx_basketball.cpp',
 
-    'src/rtx_GameField.cpp',
-    'src/LogicManager.cpp',
-    'src/RobotexCommSrv.cpp',
+    'src/core/rtx_GameField.cpp',
+    'src/core/rtx_LogicManager.cpp',
+    'src/core/rtx_RobotexCommSrv.cpp',
 
-    'src/protocol/rtex_DriveProtocol.cpp',
-    'src/protocol/rtex_HardwareProtocol.cpp',
-    'src/protocol/rtex_VisionProtocol.cpp',
+    'src/protocol/rtx_DriveProtocol.cpp',
+    'src/protocol/rtx_HardwareProtocol.cpp',
+    'src/protocol/rtx_VisionProtocol.cpp',
   ],
 }

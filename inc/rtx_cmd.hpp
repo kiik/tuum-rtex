@@ -1,8 +1,9 @@
 
-#ifndef RTX_CMDS_H
-#define RTX_CMDS_H
+#ifndef RTX_CMD_H
+#define RTX_CMD_H
 
-namespace tuum { namespace cmds {
+namespace rtx {
+namespace cmd {
 
   int drive(float, float, float);
 

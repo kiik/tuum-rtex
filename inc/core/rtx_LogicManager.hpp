@@ -11,7 +11,9 @@
 
 #include "STM.hpp"
 
-namespace tuum {
+using namespace tuum;
+
+namespace rtx {
 
   class LogicManager {
   public:

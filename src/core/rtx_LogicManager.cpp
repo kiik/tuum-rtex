@@ -6,15 +6,14 @@
  *  @date 28. November 2015
  */
 
-#include "rtx_ctl.hpp"
-
-#include "LogicManager.hpp"
-
 #include "tuum_navigator.hpp"
-
 #include "tuum_context.hpp"
 
-namespace tuum {
+#include "core/rtx_LogicManager.hpp"
+
+#include "rtx_ctl.hpp"
+
+namespace rtx {
 
   /**
    *  Controllers:

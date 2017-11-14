@@ -1,12 +1,14 @@
 
 #include "hal.hpp"
 
-#include "rtx_cmds.hpp"
-#include "protocol/rtex_HardwareProtocol.hpp"
+#include "protocol/rtx_HardwareProtocol.hpp"
 
+#include "rtx_cmd.hpp"
+
+using namespace tuum;
 using namespace tuum::wsocs;
 
-namespace tuum {
+namespace rtx {
 
   HardwareProtocol::HardwareProtocol():
     WSProtocol({

@@ -3,9 +3,12 @@
 
 #include "hal.hpp"
 
-#include "rtx_cmds.hpp"
+#include "rtx_cmd.hpp"
 
-namespace tuum { namespace cmds {
+using namespace tuum;
+
+namespace rtx {
+namespace cmd {
 
   int drive(float spd, float dir, float rot) {
     hal::hw.getMotorControl()->omniDrive(spd, dir, rot);

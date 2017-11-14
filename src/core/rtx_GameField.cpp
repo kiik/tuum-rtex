@@ -1,7 +1,7 @@
 
-#include "rtx_GameField.hpp"
+#include "core/rtx_GameField.hpp"
 
-namespace tuum {
+namespace rtx {
 
   GameField::GameField()
   {

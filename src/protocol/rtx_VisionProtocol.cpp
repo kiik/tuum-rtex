@@ -4,19 +4,20 @@
 
 #include "base64.hpp"
 
+#include "lpx_iformat.hpp"
+
 #include "hal.hpp"
 
 #include "tuum_system.hpp"
 #include "tuum_visioning.hpp"
 #include "tuum_context.hpp"
 
-#include "lpx_iformat.hpp"
+#include "protocol/rtx_VisionProtocol.hpp"
 
-#include "protocol/rtex_VisionProtocol.hpp"
-
+using namespace tuum;
 using namespace tuum::wsocs;
 
-namespace tuum {
+namespace rtx {
 
   const char* JS_METHOD = "m";
   const char* JS_MTH_GET = "get";

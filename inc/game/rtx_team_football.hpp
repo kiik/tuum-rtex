@@ -1,4 +1,4 @@
-/** @file tfb_logic.hpp
+/** @file rtx_team_football.hpp
  *  Team football logic module.
  *
  *  @authors Meelik Kiik
@@ -11,7 +11,8 @@
 
 #include "application.hpp"
 
-namespace tuum { namespace TFBLogic {
+namespace rtx {
+namespace TeamFootball {
 
   enum GameState {
     STOP,

@@ -1,8 +1,11 @@
+
 #include "SmackTalk.hpp"
 
-
 using namespace boost::filesystem;
-namespace tuum { namespace Smacktalk {
+
+namespace rtx {
+namespace Smacktalk {
+
   std::vector<std::string> random_sounds;
   std::vector<std::string> hit_sounds;
   std::vector<std::string> miss_sounds;

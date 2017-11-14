@@ -9,7 +9,9 @@
 #include "Ball.hpp"
 #include "Goal.hpp"
 
-namespace tuum {
+using namespace tuum;
+
+namespace rtx {
 
   class GameField
   {

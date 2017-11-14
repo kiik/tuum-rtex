@@ -1,25 +1,26 @@
 
-#ifndef RTX_UI_H
-#define RTX_UI_H
+#ifndef RTX_COMM_H
+#define RTX_COMM_H
 
 #include "json.hpp"
 
 #include "tuum_wsproto.hpp"
 
-#include "WebSocketServer.hpp"
+#include "wsocs/WebSocketServer.hpp"
 
-#include "protocol/tuum_VisionProtocol.hpp"
-#include "protocol/rtex_DriveProtocol.hpp"
-#include "protocol/rtex_HardwareProtocol.hpp"
+#include "protocol/rtx_VisionProtocol.hpp"
+#include "protocol/rtx_DriveProtocol.hpp"
+#include "protocol/rtx_HardwareProtocol.hpp"
 
+using namespace tuum;
 using namespace tuum::wsocs;
 
-namespace tuum { namespace gui {
+namespace rtx {
 
-  class RobotexUIServer : public wsocs::WebSocketServer
+  class RobotexCommSrv : public wsocs::WebSocketServer
   {
   public:
-    RobotexUIServer();
+    RobotexCommSrv();
 
     // Standard ABI
     enum ECommand {
@@ -47,6 +48,6 @@ namespace tuum { namespace gui {
 
   };
 
-}}
+}
 
 #endif

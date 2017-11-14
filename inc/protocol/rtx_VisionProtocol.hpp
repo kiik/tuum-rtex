@@ -6,7 +6,7 @@
 
 using namespace tuum::wsocs;
 
-namespace tuum {
+namespace rtx {
 
   class VisionProtocol : public WSProtocol
   {

@@ -1,15 +1,15 @@
 
 #include "hal.hpp"
 
-#include "RobotexUIServer.hpp"
+#include "core/rtx_RobotexCommSrv.hpp"
 
-#include "rtx_cmds.hpp"
+#include "rtx_cmd.hpp"
 
 using namespace tuum::wsocs;
 
-namespace tuum { namespace gui {
+namespace rtx {
 
-  RobotexUIServer::RobotexUIServer():
+  RobotexCommSrv::RobotexCommSrv():
     WebSocketServer()
   {
     mDrvProtocol.setWS(this);
@@ -20,23 +20,23 @@ namespace tuum { namespace gui {
     id = proto()->add(mHwProtocol.getDescriptor());
   }
 
-  void RobotexUIServer::onGet()
+  void RobotexCommSrv::onGet()
   {
 
   }
 
-  void RobotexUIServer::onConnect()
+  void RobotexCommSrv::onConnect()
   {
 
   }
 
-  int RobotexUIServer::send(json& dat)
+  int RobotexCommSrv::send(json& dat)
   {
     dat["_"] = mCtx->mId;
     return WebSocketServer::send(dat);
   }
 
-  void RobotexUIServer::onMessage(lws *wsi, void *in, size_t len)
+  void RobotexCommSrv::onMessage(lws *wsi, void *in, size_t len)
   {
     WSProtocol::Request* req = (WSProtocol::Request*)in;
 
@@ -52,7 +52,7 @@ namespace tuum { namespace gui {
     }
   }
 
-  void RobotexUIServer::onMessage(WSProtocol::Message ms)
+  void RobotexCommSrv::onMessage(WSProtocol::Message ms)
   {
     auto it = ms.dat.find(WSProtocol::JS_URI);
     if(it == ms.dat.end()) return;
@@ -65,4 +65,4 @@ namespace tuum { namespace gui {
     }
   }
 
-}}
+}

@@ -6,18 +6,19 @@
  *  @date 2. November 2015
  */
 
-#include "RefereeListener.hpp"
-#include "STM.hpp"
-#include "LogicManager.hpp"
-
 #include "tuum_motion.hpp"
 #include "tuum_context.hpp"
 
-#include "rtx_tfb.hpp"
+#include "STM.hpp"
+#include "RefereeListener.hpp"
+
+#include "core/rtx_LogicManager.hpp"
+#include "game/rtx_team_football.hpp"
 
 using namespace tuum::hal;
 
-namespace tuum { namespace TFBLogic {
+namespace rtx {
+namespace TeamFootball {
 
   GameState gmState;
   GamePhase gmPhase;

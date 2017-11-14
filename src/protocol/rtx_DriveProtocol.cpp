@@ -1,15 +1,15 @@
 
-#include "rtx_cmds.hpp"
-
 #include "tuum_motion.hpp"
 #include "tuum_context.hpp"
 #include "tuum_system.hpp"
 
-#include "protocol/rtex_DriveProtocol.hpp"
+#include "protocol/rtx_DriveProtocol.hpp"
+
+#include "rtx_cmd.hpp"
 
 using namespace tuum::wsocs;
 
-namespace tuum {
+namespace rtx {
 
   DriveProtocol::DriveProtocol():
     WSProtocol({
@@ -51,7 +51,7 @@ namespace tuum {
 
   //TODO: Error catching
   int DriveProtocol::drive(json dat) {
-    tuum::cmds::drive(dat["s"], dat["d"].get<float>() / 1000.0, dat["r"]);
+    rtx::cmd::drive(dat["s"], dat["d"].get<float>() / 1000.0, dat["r"]);
   }
 
   int DriveProtocol::getInfo(const json& dat) {

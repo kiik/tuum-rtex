@@ -18,14 +18,16 @@
 
 #include "hal.hpp"
 
-#include "rtx_context.hpp"
-#include "rtx_GameField.hpp"
+#include "core/rtx_GameField.hpp"
+
 #include "rtx_ctl.hpp"
+
+#include "robotex.hpp"
 
 using namespace tuum::comm;
 using namespace tuum::hal;
 
-namespace tuum {
+namespace rtx {
 
   void TwitchScan::_init() {
     wait_for_vision = true;
@@ -67,7 +69,8 @@ namespace tuum {
 
 }
 
-namespace tuum { namespace ctl {
+namespace rtx {
+namespace ctl {
 
   hal::MainBoard* mb = hal::hw.getMainBoard();
 
@@ -94,7 +97,6 @@ namespace tuum { namespace ctl {
   /*void kickOff() {
     mDoKickoff = true;
   }*/
-
 
   int LSPlaceholder::run() {
     if(!mDoKickoff) return 0;

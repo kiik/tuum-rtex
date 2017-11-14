@@ -9,7 +9,7 @@
 
 using namespace tuum::wsocs;
 
-namespace tuum {
+namespace rtx {
 
   class HardwareProtocol : public WSProtocol
   {

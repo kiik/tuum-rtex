@@ -20,7 +20,7 @@
 #include "Goal.hpp"
 
 
-namespace tuum {
+namespace rtx {
 
   class TwitchScan {
   private:
@@ -41,7 +41,8 @@ namespace tuum {
 
 }
 
-namespace tuum { namespace ctl {
+namespace rtx {
+namespace ctl {
 
   class LSPlaceholder : public Controller {
     public:

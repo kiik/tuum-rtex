@@ -1,4 +1,4 @@
-/** @file rtx_fb.hpp
+/** @file rtx_football.hpp
  *  Robotex 1vs1 football logic module.
  *
  *  @authors Meelik Kiik
@@ -6,13 +6,14 @@
  *  @date 17. November 2015
  */
 
-#ifndef RTX_TFB_LOGIC_H
-#define RTX_TFB_LOGIC_H
+#ifndef RTX_FOOTBALL_LOGIC_H
+#define RTX_FOOTBALL_LOGIC_H
 
 #include "application.hpp"
 #include "STM.hpp"
 
-namespace tuum { namespace FBLogic {
+namespace rtx {
+namespace Football {
 
   extern STM stm;
 

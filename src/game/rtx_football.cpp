@@ -6,17 +6,18 @@
  *  @date 17. November 2015
  */
 
-#include "STM.hpp"
-#include "LogicManager.hpp"
-
 #include "tuum_motion.hpp"
 #include "tuum_context.hpp"
 
-#include "rtx_fb.hpp"
+#include "STM.hpp"
+
+#include "core/rtx_LogicManager.hpp"
+#include "game/rtx_football.hpp"
 
 using namespace tuum::hal;
 
-namespace tuum { namespace FBLogic {
+namespace rtx {
+namespace Football {
 
   enum GameState {
     STOP,
