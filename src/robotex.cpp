@@ -14,7 +14,7 @@
 
 #include "core/rtx_LogicManager.hpp"
 #include "core/rtx_GameField.hpp"
-#include "game/rtx_football.hpp"
+#include "game/rtx_basketball.hpp"
 
 #include "rtx_ctl.hpp"
 
@@ -29,13 +29,15 @@ namespace rtx {
   GameField *gGameField = nullptr;
 
   void setup() {
+    gSys.insmod(new tuum::Navigator());
+
     gGameField = new GameField();
 
-    // FBLogic::setup();
+    Basketball::setup();
   }
 
   void process() {
-    // FBLogic::process();
+    Basketball::process();
   }
 
 }
