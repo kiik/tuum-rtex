@@ -12,6 +12,9 @@
 namespace rtx {
 namespace Basketball {
 
+  void setup();
+  void process();
+
 }}
 
 #endif

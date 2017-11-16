@@ -19,6 +19,7 @@
 #include "Ball.hpp"
 #include "Goal.hpp"
 
+using namespace tuum;
 
 namespace rtx {
 
@@ -42,7 +43,6 @@ namespace rtx {
 }
 
 namespace rtx {
-namespace ctl {
 
   class LSPlaceholder : public Controller {
     public:
@@ -332,6 +332,6 @@ namespace ctl {
     Context ctx;
   };
 
-}}
+}
 
-#endif // RTX_CTL_H
+#endif

@@ -27,14 +27,14 @@ namespace rtx {
 
     st = stm->createState("STBallLocate");
     ctx.st = st;
-    st->addController(new ctl::LSBallLocate(ctx));
+    st->addController(new rtx::LSBallLocate(ctx));
 
     st2 = stm->createState("STBallNavigator");
     st2->setLastState(st);
     st->setNextState(st2);
     st = st2;
     ctx.st = st;
-    st->addController(new ctl::LSBallNavigator(ctx));
+    st->addController(new rtx::LSBallNavigator(ctx));
 
     return stm;
   }
@@ -46,7 +46,7 @@ namespace rtx {
 
     st = stm->createState("STAllyFind");
     ctx.st = st;
-    st->addController(new ctl::LSAllyFind(ctx));
+    st->addController(new rtx::LSAllyFind(ctx));
 
 
     st2 = stm->createState("STAllyAim");
@@ -54,7 +54,7 @@ namespace rtx {
     st->setNextState(st2);
     st = st2;
     ctx.st = st;
-    st->addController(new ctl::LSAllyAim(ctx));
+    st->addController(new rtx::LSAllyAim(ctx));
 
     return stm;
   }
@@ -75,21 +75,21 @@ namespace rtx {
     st->setNextState(st2);
     st = st2;
     ctx.st = st;
-    st->addController(new ctl::LSBallPicker(ctx));
+    st->addController(new rtx::LSBallPicker(ctx));
 
     st2 = stm->createState("STAllyLocate");
     st2->setLastState(st);
     st->setNextState(st2);
     st = st2;
     ctx.st = st;
-    st->addController(new ctl::LSAllyLocate(ctx));
+    st->addController(new rtx::LSAllyLocate(ctx));
 
     st2 = stm->createState("STAllyPass");
     st2->setLastState(st);
     st->setNextState(st2);
     st = st2;
     ctx.st = st;
-    st->addController(new ctl::LSAllyPass(ctx));
+    st->addController(new rtx::LSAllyPass(ctx));
 
     return stm;
   }
@@ -125,20 +125,20 @@ namespace rtx {
     st = stm->createState("STInit");
     stm->setState(st);
     ctx.st = st;
-    st->addController(new ctl::LSInit(ctx));
+    st->addController(new rtx::LSInit(ctx));
 
     st2 = stm->createState("STBallLocate");
     st->setNextState(st2);
     st = st2;
     ctx.st = st;
-    st->addController(new ctl::LSBallLocate(ctx));
+    st->addController(new rtx::LSBallLocate(ctx));
 
     st2 = stm->createState("STBallNavigator");
     st2->setLastState(st);
     st->setNextState(st2);
     st = st2;
     ctx.st = st;
-    st->addController(new ctl::LSBallNavigator(ctx));
+    st->addController(new rtx::LSBallNavigator(ctx));
 
 
     st2 = stm->createState("STBallPicker");
@@ -146,14 +146,14 @@ namespace rtx {
     st->setNextState(st2);
     st = st2;
     ctx.st = st;
-    st->addController(new ctl::LSBallPicker(ctx));
+    st->addController(new rtx::LSBallPicker(ctx));
 
     st2 = stm->createState("STGoalLocate");
     st2->setLastState(st);
     st->setNextState(st2);
     st = st2;
     ctx.st = st;
-    st->addController(new ctl::LSGoalLocate(ctx));
+    st->addController(new rtx::LSGoalLocate(ctx));
     stm->addRootState(st);
 
 
@@ -162,7 +162,7 @@ namespace rtx {
     st->setNextState(st2);
     st = st2;
     ctx.st = st;
-    st->addController(new ctl::LSGoalShoot(ctx));
+    st->addController(new rtx::LSGoalShoot(ctx));
 
     return stm;
   }
@@ -178,19 +178,19 @@ namespace rtx {
     st = stm->createState("STFindAllyGoal");
     stm->setState(st);
     ctx.st = st;
-    st->addController(new ctl::LSAllyGoalLocate(ctx));
+    st->addController(new rtx::LSAllyGoalLocate(ctx));
 
     st2 = stm->createState("STAllyGoalMove");
     st2->setLastState(st);
     st->setNextState(st2);
     st = st2;
     ctx.st = st;
-    st->addController(new ctl::LSMoveToEntity(ctx, nullptr, 100)); // FIXME: gNavi->getAllyGoal()
+    st->addController(new rtx::LSMoveToEntity(ctx, nullptr, 100)); // FIXME: gNavi->getAllyGoal()
 
     st2 = stm->createState("STGoalee");
     stm->setState(st);
     ctx.st = st;
-    st->addController(new ctl::LSGoalee(ctx));
+    st->addController(new rtx::LSGoalee(ctx));
 
     return stm;
   }
@@ -207,7 +207,7 @@ namespace rtx {
     st = stm->createState("STBallLocate");
     stm->setState(st);
     ctx.st = st;
-    st->addController(new ctl::LSBallLocate(ctx));
+    st->addController(new rtx::LSBallLocate(ctx));
 
 
     st2 = stm -> createState("STMoveToBall");
@@ -215,7 +215,7 @@ namespace rtx {
     st->setNextState(st2);
     st = st2;
     ctx.st = st;
-    //st->addController(new ctl::LSMoveToEntity(ctx, gNavi->getNearestBall(), 500));
+    //st->addController(new rtx::LSMoveToEntity(ctx, gNavi->getNearestBall(), 500));
 
     std::cout << "State placed ball" << std::endl;
 
@@ -231,7 +231,7 @@ namespace rtx {
     st = stm -> createState("STMoveToBall");
     stm->setState(st);
     ctx.st = st;
-    //st->addController(new ctl::LSMoveToEntity(ctx, gNavi->getNearestBall(), 1000));
+    //st->addController(new rtx::LSMoveToEntity(ctx, gNavi->getNearestBall(), 1000));
 
     return stm;
   }
@@ -245,7 +245,7 @@ namespace rtx {
     st = stm -> createState("STWaitForEnemyKickoff");
     stm->setState(st);
     ctx.st = st;
-    st ->addController(new ctl::LSWaitForEnemyKickoff(ctx));
+    st ->addController(new rtx::LSWaitForEnemyKickoff(ctx));
 
     //Move to centerline
 
@@ -254,7 +254,7 @@ namespace rtx {
     //st->setNextState(st2);
     //st = st2;
     ctx.st = st;
-    st->addController(new ctl::LSPlaceholder(ctx, "LSPlaceholder#0", 10, 0, 0));
+    st->addController(new rtx::LSPlaceholder(ctx, "LSPlaceholder#0", 10, 0, 0));
 
 
     st2 = stm-> createState("STPlaceholder2");
@@ -262,7 +262,7 @@ namespace rtx {
     st->setNextState(st2);
     st = st2;
     ctx.st = st;
-    st->addController(new ctl::LSPlaceholder(ctx, "LSPlaceholder#1", 0, 0, 10));*/
+    st->addController(new rtx::LSPlaceholder(ctx, "LSPlaceholder#1", 0, 0, 10));*/
 
     return stm;
   }
@@ -277,7 +277,7 @@ namespace rtx {
     st = stm->createState("STBallLocate");
     stm->setState(st);
     ctx.st = st;
-    st->addController(new ctl::LSBallLocate(ctx));
+    st->addController(new rtx::LSBallLocate(ctx));
 
 
     st2 = stm->createState("STMoveToBall");
@@ -285,7 +285,7 @@ namespace rtx {
     st->setNextState(st2);
     st = st2;
     ctx.st = st;
-    st->addController(new ctl::LSBallNavigator(ctx));*/
+    st->addController(new rtx::LSBallNavigator(ctx));*/
 
     STM* stm = new STM();
     State* st, *st2;
@@ -298,7 +298,7 @@ namespace rtx {
     //st->setNextState(st2);
     //st = st2;
     ctx.st = st;
-    st->addController(new ctl::LSPlaceholder(ctx, "LSPlaceholder#0", 0, 10, 0));
+    st->addController(new rtx::LSPlaceholder(ctx, "LSPlaceholder#0", 0, 10, 0));
 
 
     st2 = stm-> createState("STPlaceholder2");
@@ -306,7 +306,7 @@ namespace rtx {
     st->setNextState(st2);
     st = st2;
     ctx.st = st;
-    st->addController(new ctl::LSPlaceholder(ctx, "LSPlaceholder#1", 10, 10, 0));
+    st->addController(new rtx::LSPlaceholder(ctx, "LSPlaceholder#1", 10, 10, 0));
 
     return stm;
 
@@ -321,7 +321,7 @@ namespace rtx {
     st = stm -> createState("STMoveToBall");
     stm->setState(st);
     ctx.st = st;
-    // st->addController(new ctl::LSMoveToEntity(ctx, gNavi->getNearestBall(), 500));
+    // st->addController(new rtx::LSMoveToEntity(ctx, gNavi->getNearestBall(), 500));
 
     return stm;
   }

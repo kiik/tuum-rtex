@@ -70,7 +70,6 @@ namespace rtx {
 }
 
 namespace rtx {
-namespace ctl {
 
   hal::MainBoard* mb = hal::hw.getMainBoard();
 
@@ -671,4 +670,4 @@ ERR:
     return 1;
   }
 
-}}
+}
