@@ -120,6 +120,7 @@ namespace rtx {
 
     private:
       Context ctx;
+      soft_clk_t m_dbg_clk;
   };
 
   class LSBallPicker : public Controller {
@@ -132,6 +133,7 @@ namespace rtx {
 
     private:
       Context ctx;
+      soft_clk_t m_dbg_clk;
   };
 
 
