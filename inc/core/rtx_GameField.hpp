@@ -11,7 +11,8 @@
 #include "Ball.hpp"
 #include "Goal.hpp"
 
-#include "rtx_goal_detect.hpp"
+#include "cmv/object_search.hpp"
+#include "cmv/marker_search.hpp"
 
 using namespace tuum;
 
@@ -23,6 +24,12 @@ namespace rtx {
     GameField();
 
     void tick();
+
+    void digestBallBlob(cmv::blob_t&);
+    void digestGoalBlob(cmv::blob_t&);
+
+    void digestBallBlobs(BlobSet&);
+    void digestGoalBlobs(BlobSet&);
 
     void digestGoalMarkers(MarkerSet&, int, int);
 
@@ -39,7 +46,8 @@ namespace rtx {
     Transform calcAllyGoalPos(Transform*);
 
   private:
-    Goal mGoal;
+    Goal mG1_pink, mG2_blue;
+
     Vec2i mGoalPos;
     float mGoalConfidence;
 

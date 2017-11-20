@@ -21,7 +21,12 @@
     'inc'
   ],
   'sources': [
-    'src/rtx_goal_detect.cpp',
+    'src/cmv/conv.c',
+    'src/cmv/cmvision.cpp',
+    'src/cmv/blob_finder.cpp',
+    'src/cmv/object_search.cpp',
+    'src/cmv/marker_search.cpp',
+    'src/rtx_cmv.cpp',
 
     'src/rtx_ctl.cpp',
     'src/rtx_cmd.cpp',

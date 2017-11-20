@@ -1,4 +1,6 @@
 
+#include "cmv/object_search.hpp"
+
 #include "core/rtx_GameField.hpp"
 
 namespace rtx {
@@ -17,6 +19,26 @@ namespace rtx {
   void GameField::tick()
   {
 
+  }
+
+  void GameField::digestBallBlob(cmv::blob_t& bl)
+  {
+    printf("[GameField::digestBallBlob]GOT: %s\n", bl.name.c_str());
+  }
+
+  void GameField::digestGoalBlob(cmv::blob_t& bl)
+  {
+    printf("[GameField::digestGoalBlob]GOT: %s\n", bl.name.c_str());
+  }
+
+  void GameField::digestBallBlobs(BlobSet& bls)
+  {
+    for(auto &bl : bls) digestBallBlob(bl);
+  }
+
+  void GameField::digestGoalBlobs(BlobSet& bls)
+  {
+    for(auto &bl : bls) digestGoalBlob(bl);
   }
 
   void GameField::digestGoalMarkers(MarkerSet& markers, int W_2, int H)
@@ -152,8 +174,8 @@ namespace rtx {
 
   Goal* GameField::getOpponentGoal()
   {
-    if(mGoalConfidence < 0.5) return nullptr;
-    return &mGoal;
+    //if(mGoalConfidence < 0.5) return nullptr;
+    return nullptr;
   }
 
   unsigned int GameField::countValidBalls()

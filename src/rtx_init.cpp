@@ -2,12 +2,15 @@
 #include "robotex.hpp"
 
 #include "tuum_platform.hpp"
+#include "tuum_lpx.hpp"
 #include "tuum_context.hpp"
 #include "tuum_comm.hpp"
 
+#include "hal.hpp"
+
 #include "core/rtx_RobotexCommSrv.hpp"
 
-#include "rtx_goal_detect.hpp"
+#include "rtx_cmv.hpp"
 
 namespace rtx {
 
@@ -24,8 +27,6 @@ namespace rtx {
 }
 
 int main(int argc, char* argv[]) {
-  // return rtx_goal_detection_main(argc, argv);
-
   tuum::setGlobalSystem(&(rtx::gSys));
 
   if(tuum::init(argc, argv) < 0) return -1;
@@ -34,11 +35,19 @@ int main(int argc, char* argv[]) {
     RTXLOG("UI initialization failed!", LOG_ERR);
     return -2;
   }
+  
+  // hal::setup();
+
+  tuum::lpx::init();
+  tuum::lpx::setup();
 
   rtx::gSys.setup();
   rtx::setup();
 
+  return rtx::cmv_tests_main(argc, argv);
+
   while(1) {
+    hal::process();
     rtx::gSys.process();
     rtx::process();
   }
