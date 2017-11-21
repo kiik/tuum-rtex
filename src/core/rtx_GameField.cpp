@@ -18,17 +18,46 @@ namespace rtx {
 
   void GameField::tick()
   {
+    for(auto it = mBalls.begin(); it != mBalls.end(); ++it) {
+      it->tick();
 
+      if(it->deadFrameCount() >= 5)
+        mBalls.erase(it);
+    }
+
+    mG1_pink.tick();
+    mG1_pink.tick();
   }
 
   void GameField::digestBallBlob(cmv::blob_t& bl)
   {
-    printf("[GameField::digestBallBlob]GOT: %s\n", bl.name.c_str());
+    // printf("[GameField::digestBallBlob]GOT: %s\n", bl.name.c_str());
+
+    //TODO: Apply undistortion, T_cameraToWorld
+    Blob blob(bl.name, {
+      .rect = {bl.left, bl.right, bl.top, bl.bottom},
+      .realArea = bl.area
+    });
+
+    Ball *ptr;
+    for(auto &ball : mBalls)
+    {
+      if(ball.matched()) continue;
+
+      // Match blob to entity from last frame
+      if(ball.matchPercent(blob) > 0.5)
+      {
+        ball.match(blob);
+        return;
+      }
+    }
+
+    mBalls.push_back(Ball((const Blob&)blob));
   }
 
   void GameField::digestGoalBlob(cmv::blob_t& bl)
   {
-    printf("[GameField::digestGoalBlob]GOT: %s\n", bl.name.c_str());
+    // printf("[GameField::digestGoalBlob]GOT: %s\n", bl.name.c_str());
   }
 
   void GameField::digestBallBlobs(BlobSet& bls)
@@ -164,7 +193,27 @@ namespace rtx {
 
   Ball* GameField::getNearestBall()
   {
-    return nullptr;
+    Ball *ptr = nullptr;
+    float d0, d;
+
+    for(auto &bl : mBalls)
+    {
+      if(ptr == nullptr)
+      {
+        ptr = &bl;
+        d0  = ptr->getTransform()->getPosition().getMagnitude();
+        continue;
+      }
+
+      d = bl.getTransform()->getPosition().getMagnitude();
+
+      if(d < d0) {
+        ptr = &bl;
+        d0 = d;
+      }
+    }
+
+    return ptr;
   }
 
   Goal* GameField::getAllyGoal()
@@ -180,7 +229,7 @@ namespace rtx {
 
   unsigned int GameField::countValidBalls()
   {
-    return 0;
+    return mBalls.size();
   }
 
   Transform GameField::calcBallPickupPos(Transform* in)

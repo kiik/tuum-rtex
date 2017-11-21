@@ -18,6 +18,8 @@ using namespace tuum;
 
 namespace rtx {
 
+  typedef std::vector<Ball> BallSet;
+
   class GameField
   {
   public:
@@ -46,6 +48,7 @@ namespace rtx {
     Transform calcAllyGoalPos(Transform*);
 
   private:
+    BallSet mBalls;
     Goal mG1_pink, mG2_blue;
 
     Vec2i mGoalPos;

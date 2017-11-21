@@ -60,6 +60,7 @@ namespace rtx {
 
       switch(objTypeBuf) {
         case OBJ_BALL:
+          balls.push_back(*ptr);
           break;
         case OBJ_GOAL:
           goals.push_back(*ptr);
@@ -68,8 +69,8 @@ namespace rtx {
     };
 
     int res = blobHunter.findAllBlobs(img, blob_cb);
+    //printf("balls_n=%u, goals_n=%u\n", balls.size(), goals.size());
 
-    // printf("balls_n=%u, goals_n=%u\n", balls.size(), goals.size());
     if(balls.size() > 0)
     {
       gmField->digestBallBlobs(balls);

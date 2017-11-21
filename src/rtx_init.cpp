@@ -35,16 +35,14 @@ int main(int argc, char* argv[]) {
     RTXLOG("UI initialization failed!", LOG_ERR);
     return -2;
   }
-  
-  // hal::setup();
+
+  hal::setup();
 
   tuum::lpx::init();
   tuum::lpx::setup();
 
   rtx::gSys.setup();
   rtx::setup();
-
-  return rtx::cmv_tests_main(argc, argv);
 
   while(1) {
     hal::process();
