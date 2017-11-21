@@ -10,14 +10,15 @@ using namespace tuum::wsocs;
 namespace rtx {
 
   RobotexCommSrv::RobotexCommSrv():
-    WebSocketServer()
+    WebSocketServer(),
+    mDrvProtocol(new DriveProtocol()),
+    mVisProtocol(new VisionProtocol()),
+    mHwProtocol(new HardwareProtocol())
   {
-    mDrvProtocol.setWS(this);
-    mVisProtocol.setWS(this);
-
-    size_t id = proto()->add(mDrvProtocol.getDescriptor());
-    id = proto()->add(mVisProtocol.getDescriptor());
-    id = proto()->add(mHwProtocol.getDescriptor());
+    size_t id;
+    id = registerProtocol(mDrvProtocol);
+    id = registerProtocol(mVisProtocol);
+    id = registerProtocol(mHwProtocol);
   }
 
   void RobotexCommSrv::onGet()
@@ -54,14 +55,12 @@ namespace rtx {
 
   void RobotexCommSrv::onMessage(WSProtocol::Message ms)
   {
-    auto it = ms.dat.find(WSProtocol::JS_URI);
-    if(it == ms.dat.end()) return;
-    if(!it.value().is_string()) return;
+    // printf("%s\n", ms.dat.dump().c_str());
 
     mCtx->mId = ms.dat[WSProtocol::JS_M_ID].get<size_t>();
 
     if(proto()->route(ms) < 0) {
-      RTXLOG(format("Unknown URI '%s'!", ms.getURI().c_str()), LOG_ERR);
+      RTXLOG(tuum::format("Unknown URI '%s'!", ms.getURI().c_str()), LOG_ERR);
     }
   }
 

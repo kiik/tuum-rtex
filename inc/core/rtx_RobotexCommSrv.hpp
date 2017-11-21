@@ -42,9 +42,9 @@ namespace rtx {
     int send(json& dat);
 
   private:
-    DriveProtocol  mDrvProtocol;
-    VisionProtocol mVisProtocol;
-    HardwareProtocol mHwProtocol;
+    DriveProtocol  *mDrvProtocol;
+    VisionProtocol *mVisProtocol;
+    HardwareProtocol *mHwProtocol;
 
   };
 

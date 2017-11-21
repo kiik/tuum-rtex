@@ -18,8 +18,12 @@ namespace rtx {
   RobotexCommSrv gCommSrv;
 
   int ui_init(int argc, char* argv[]) {
+    tuum::comm::init();
+
     if(gCommSrv.init() < 0) return -1;
     if(tuum::wsocs::register_server(&gCommSrv) < 0) return -2;
+
+    tuum::comm::setup();
 
     return 0;
   }

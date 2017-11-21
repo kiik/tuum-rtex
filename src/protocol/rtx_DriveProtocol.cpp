@@ -18,21 +18,11 @@ namespace rtx {
       "0.0.1-al.0",
       {
         {"Omni Drive", "/omni", {
-            {"MotorPower", "mp", WSType::WST_Integer},
-            {"Motor Valve", "mv", WSType::WST_Integer},
-            {"Joint Valve", "jv", WSType::WST_Integer},
+            {"Motor Power", "s", WSType::WST_Integer},
+            {"Direction",   "d", WSType::WST_Integer},
+            {"Turn Rate",   "r", WSType::WST_Integer},
           }
-        },
-        {"Drive Signal", "/drvsig", {
-            {"Signal Name", "s", WSType::WST_String},
-          }
-        },
-        {"Get Drive Feedback", "/fb", {}},
-
-        {"Get Control Mode", "/ctlm.get", {}},
-        {"Set Control Mode", "/ctlm.set", {
-          {"Control Mode", "ctlm", WSType::WST_String}
-        }}
+        }
       },
       this
     })
@@ -51,7 +41,16 @@ namespace rtx {
 
   //TODO: Error catching
   int DriveProtocol::drive(json dat) {
-    rtx::cmd::drive(dat["s"], dat["d"].get<float>() / 1000.0, dat["r"]);
+    int v = dat["s"].get<int>();
+    float a = dat["d"].get<int>();
+    int rot_v = dat["r"].get<int>();
+
+    if(a == 1) a = 1.57;
+    else if(a == -1) a = -1.57;
+    else if(a == 3) a = 3.14;
+    else a = 0;
+
+    rtx::cmd::drive(v, a, rot_v);
   }
 
   int DriveProtocol::getInfo(const json& dat) {
