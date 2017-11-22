@@ -293,6 +293,22 @@ namespace rtx {
     return out;
   }
 
+  Transform GameField::ballPickupPos(BallHandle bl, GoalHandle gl)
+  {
+    Transform out;
+
+    auto p0 = bl->getTransform()->getPosition(),
+         p1 = gl->getTransform()->getPosition();
+
+    Vec2D<double> avec = (p1 - p0).getNormalized();
+    Vec2i pvec = p0 - avec * 55;
+
+    out.setPosition(pvec);
+    out.setOrientation(avec.getOrientation());
+
+    return out;
+  }
+
   Transform GameField::calcAllyGoalPos(Transform* in)
   {
     Transform out = *in;

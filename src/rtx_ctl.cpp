@@ -29,6 +29,36 @@ using namespace tuum::hal;
 
 namespace rtx {
 
+  void autoaim()
+  {
+    if(gNav != nullptr)
+    {
+
+      // gNav->aim(b->getTransform()->getPosition());
+
+      /*
+      auto ctx = gNav->getContext();
+      if(!ctx.hasAim())
+      {
+        GoalHandle gl = gGameField->getOpponentGoal();
+        BallHandle bl = b; // gGameField->getNearestBall();
+
+        if((gl != nullptr) && (bl != nullptr))
+        {
+          auto p1 = bl->getTransform()->getPosition(),
+               p2 = gl->getTransform()->getPosition();
+
+          Vec2f dv = Vec2f(p2 - p1) * 0.5;
+          Vec2i p = p1 + dv;
+
+          gNav->aim(p);
+          printf("AUTOAIM ball=(%i, %i), goal=(%i, %i), dv=(%.1f, %.1f), aim=(%i, %i)\n", p1.x, p1.y, p2.x, p2.y, dv.x, dv.y, p.x, p.y);
+          // ctx = gNav->getContext();
+        }
+        */
+      }
+  }
+
   void TwitchScan::_init() {
     wait_for_vision = true;
 
@@ -209,52 +239,29 @@ namespace rtx {
   {
     tuum::Navigator *gNav = (tuum::Navigator*)gSystem->findSubsystem(Navigator::GetType());
 
-    BallHandle b = nullptr;
+    BallHandle bl;
+    GoalHandle gl;
 
     // if(mb->getBallSensorState()) goto OK;
     if(gGameField->countValidBalls() <= 0) goto ERR;
 
-    b = gGameField->getNearestBall();
+    bl = gGameField->getNearestBall();
+    gl = gGameField->getOpponentGoal();
 
-    if(b != nullptr) {
-      auto bt = b->getTransform();
-      Vec2i pos = gGameField->calcBallPickupPos(bt).getPosition();
+    if(bl != nullptr) {
+      Transform t = gGameField->ballPickupPos(bl, gl);
 
-      if(gNav != nullptr)
-      {
-        gNav->navTo(pos);
+      gNav->navTo(t.getPosition());
+      gNav->aim(gl->getTransform()->getPosition());
 
-        // gNav->aim(b->getTransform()->getPosition());
-
-        auto ctx = gNav->getContext();
-        if(!ctx.hasAim())
+      if(!gNav->isTargetAchieved()) {
+        //Deprecated: if(!gNav->isRunning()) gNav->start();
+        if(m_dbg_clk.tick())
         {
-          GoalHandle gl = gGameField->getOpponentGoal();
-          BallHandle bl = b; // gGameField->getNearestBall();
-
-          if((gl != nullptr) && (bl != nullptr))
-          {
-            auto p1 = bl->getTransform()->getPosition(),
-                 p2 = gl->getTransform()->getPosition();
-
-            Vec2f dv = Vec2f(p2 - p1) * 0.5;
-            Vec2i p = p1 + dv;
-
-            gNav->aim(p);
-            printf("AUTOAIM ball=(%i, %i), goal=(%i, %i), dv=(%.1f, %.1f), aim=(%i, %i)\n", p1.x, p1.y, p2.x, p2.y, dv.x, dv.y, p.x, p.y);
-            // ctx = gNav->getContext();
-          }
+          printf("[LSBallNavigator]Navigate to %s\n", bl->toString().c_str());
         }
-
-        if(!gNav->isTargetAchieved()) {
-          //Deprecated: if(!gNav->isRunning()) gNav->start();
-          if(m_dbg_clk.tick())
-          {
-            printf("[LSBallNavigator]Navigate to %s\n", b->toString().c_str());
-          }
-        } else {
-          goto OK;
-        }
+      } else {
+        goto OK;
       }
 
     } else {

@@ -153,6 +153,8 @@ namespace rtx {
     const cv::Scalar skyBlue(255, 191, 0);
     const cv::Scalar cWhite(255, 255, 255);
     const cv::Scalar cBlack(0, 0, 0);
+    const cv::Scalar cRed(0, 0, 255);
+    const cv::Scalar cGreen(0, 255, 0);
 
     {
       cv::Size sz = iFrame.size();
@@ -163,6 +165,31 @@ namespace rtx {
         cv::Point tPos(gNavCtx.tPos.x, gNavCtx.tPos.y);
         cv::line(iFrame, P0, tPos, goldenRod, 2.5);
         cv::putText(iFrame, "T", tPos, FONT_HERSHEY_SIMPLEX, 0.4, cWhite, 1.4);
+
+        float o = 0.0;
+
+        if(gNavCtx.hasOrient())
+        {
+          o = gNavCtx.tOri;
+        } else if(gNavCtx.hasAim())
+        {
+          o = (gNavCtx.aPos - gNavCtx.tPos).getOrientation();
+        }
+
+        if(o != 0.0)
+        {
+          const int L = 50;
+          cv::Point ovec(cos(o) * L, sin(o) * L);
+
+          cv::Point oPos = tPos + ovec;
+          cv::line(iFrame, tPos, oPos, cRed, 1.0);
+
+          ovec = cv::Point(cos(o + 1.57) * L, sin(o + 1.57) * L);
+          oPos = tPos + ovec;
+          cv::line(iFrame, tPos, oPos, cGreen, 1.0);
+
+          cv::putText(iFrame, "O", oPos, FONT_HERSHEY_SIMPLEX, 0.4, cWhite, 1.4);
+        }
       }
 
       if(gNavCtx.hasAim())

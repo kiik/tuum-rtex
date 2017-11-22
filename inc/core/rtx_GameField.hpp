@@ -57,6 +57,8 @@ namespace rtx {
     Transform calcBallPickupPos(Transform*);
     Transform calcAllyGoalPos(Transform*);
 
+    Transform ballPickupPos(BallHandle, GoalHandle);
+
   private:
     BallSet mBalls;
     GoalSet mGoals;
