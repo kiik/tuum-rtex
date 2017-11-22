@@ -266,14 +266,19 @@ namespace rtx {
     return ptr;
   }
 
-  Goal* GameField::getAllyGoal()
+  GoalHandle GameField::getAllyGoal()
   {
     return nullptr;
   }
 
-  Goal* GameField::getOpponentGoal()
+  GoalHandle GameField::getOpponentGoal()
   {
     //if(mGoalConfidence < 0.5) return nullptr;
+    for(auto &gl : mGoals)
+    {
+      return gl;
+    }
+
     return nullptr;
   }
 

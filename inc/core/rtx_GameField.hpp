@@ -49,8 +49,8 @@ namespace rtx {
 
     BallHandle getNearestBall();
 
-    Goal* getAllyGoal();
-    Goal* getOpponentGoal();
+    GoalHandle getAllyGoal();
+    GoalHandle getOpponentGoal();
 
     unsigned int countValidBalls();
 

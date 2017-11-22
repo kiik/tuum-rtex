@@ -31,7 +31,7 @@ namespace rtx {
 
   tuum::Navigator *gNav = nullptr;
 
-  cv::Mat frameBuffer;
+  cv::Mat frameBuffer, frameBackBuffer;
 
   void setup() {
     rtx::object_detection_init();
@@ -46,17 +46,20 @@ namespace rtx {
   }
 
   void process() {
-    hal::hw.readFrame(frameBuffer);
+    hal::hw.readFrame(frameBackBuffer);
+    frameBackBuffer.copyTo(frameBuffer);
 
-    rtx::cmv_ui_set_nav(gNav->getContext());
-    rtx::cmv_ui(frameBuffer, gGameField);
-
-    rtx::object_detection(frameBuffer, gGameField);
+    rtx::object_detection(frameBackBuffer, gGameField);
     // rtx::marker_detection(frameBuffer, gGameField);
 
     gGameField->tick();
 
     Basketball::process();
+
+    auto ctx = gNav->getContext();
+
+    rtx::cmv_ui_set_nav(ctx);
+    rtx::cmv_ui(frameBuffer, gGameField);
   }
 
 }

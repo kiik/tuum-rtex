@@ -141,8 +141,6 @@ namespace rtx {
 
     switch(ctx.phase) {
       case CP_INIT:
-        gNav->navTo({10, 10});
-
         ctx.phase = CP_RUN;
         break;
       case CP_RUN:
@@ -207,7 +205,8 @@ namespace rtx {
     m_dbg_clk.init(1000);
   }
 
-  int LSBallNavigator::run() {
+  int LSBallNavigator::run()
+  {
     tuum::Navigator *gNav = (tuum::Navigator*)gSystem->findSubsystem(Navigator::GetType());
 
     BallHandle b = nullptr;
@@ -224,7 +223,28 @@ namespace rtx {
       if(gNav != nullptr)
       {
         gNav->navTo(pos);
-        gNav->aim(b->getTransform()->getPosition());
+
+        // gNav->aim(b->getTransform()->getPosition());
+
+        auto ctx = gNav->getContext();
+        if(!ctx.hasAim())
+        {
+          GoalHandle gl = gGameField->getOpponentGoal();
+          BallHandle bl = b; // gGameField->getNearestBall();
+
+          if((gl != nullptr) && (bl != nullptr))
+          {
+            auto p1 = bl->getTransform()->getPosition(),
+                 p2 = gl->getTransform()->getPosition();
+
+            Vec2f dv = Vec2f(p2 - p1) * 0.5;
+            Vec2i p = p1 + dv;
+
+            gNav->aim(p);
+            printf("AUTOAIM ball=(%i, %i), goal=(%i, %i), dv=(%.1f, %.1f), aim=(%i, %i)\n", p1.x, p1.y, p2.x, p2.y, dv.x, dv.y, p.x, p.y);
+            // ctx = gNav->getContext();
+          }
+        }
 
         if(!gNav->isTargetAchieved()) {
           //Deprecated: if(!gNav->isRunning()) gNav->start();
@@ -376,7 +396,7 @@ ERR:
     tuum::Navigator *gNav = (tuum::Navigator*)gSystem->findSubsystem(Navigator::GetType());
     if(gNav != nullptr) gNav->stop();
 
-    Goal* goal = gGameField->getAllyGoal();
+    GoalHandle goal = gGameField->getAllyGoal();
     if(goal != nullptr)
       std::cout << "Navigate to " << goal->toString() << std::endl;
   }

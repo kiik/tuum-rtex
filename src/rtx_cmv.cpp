@@ -149,6 +149,34 @@ namespace rtx {
 
     const cv::Scalar lightGray(211, 211, 211);
     const cv::Scalar goldenRod(32, 165, 218);
+    const cv::Scalar deepPink(255, 20, 147);
+    const cv::Scalar skyBlue(255, 191, 0);
+    const cv::Scalar cWhite(255, 255, 255);
+    const cv::Scalar cBlack(0, 0, 0);
+
+    {
+      cv::Size sz = iFrame.size();
+      cv::Point P0(sz.width / 2, sz.height - robotPlaneOffset);
+
+      if(gNavCtx.hasTarget())
+      {
+        cv::Point tPos(gNavCtx.tPos.x, gNavCtx.tPos.y);
+        cv::line(iFrame, P0, tPos, goldenRod, 2.5);
+        cv::putText(iFrame, "T", tPos, FONT_HERSHEY_SIMPLEX, 0.4, cWhite, 1.4);
+      }
+
+      if(gNavCtx.hasAim())
+      {
+        cv::Point aPos(gNavCtx.aPos.x, gNavCtx.aPos.y);
+        cv::line(iFrame, P0, aPos, deepPink, 2.5);
+        cv::putText(iFrame, "A", aPos, FONT_HERSHEY_SIMPLEX, 0.4, cWhite, 1.4);
+      }
+
+      int r = 55 / 2;
+
+      cv::circle(iFrame, gInput.mousePosition, r, lightGray);
+      cv::putText(iFrame, "X", gInput.mousePosition - cv::Point(5, -5), FONT_HERSHEY_SIMPLEX, 0.4, Scalar(0, 0, 255), 2.0);
+    }
 
     {
       cv::Size sz = iFrame.size();
@@ -185,8 +213,6 @@ namespace rtx {
       cv::Size sz = iFrame.size();
       cv::Point P0(sz.width / 2, sz.height - robotPlaneOffset);
 
-      const cv::Scalar skyBlue(255, 191, 0);
-
       GoalSet *gls = gmField->getGoalsHandle();
 
       if(gls != nullptr)
@@ -210,26 +236,6 @@ namespace rtx {
           }
         }
       }
-    }
-
-    {
-      cv::Size sz = iFrame.size();
-      cv::Point P0(sz.width / 2, sz.height - robotPlaneOffset);
-
-      int r = 55 / 2;
-
-      // pos = (930, 289), diameter=55pix
-      // 0,020846495 change per 1cm
-
-      if(gNavCtx.hasTarget())
-      {
-        cv::Point tPos(gNavCtx.tPos.x, gNavCtx.tPos.y);
-        cv::line(iFrame, P0, tPos, goldenRod, 2.0);
-        cv::putText(iFrame, "T", tPos, FONT_HERSHEY_SIMPLEX, 0.5, goldenRod, 2.0);
-      }
-
-      cv::circle(iFrame, gInput.mousePosition, r, lightGray);
-      cv::putText(iFrame, "X", gInput.mousePosition - cv::Point(5, -5), FONT_HERSHEY_SIMPLEX, 0.4, Scalar(0, 0, 255, 255), 2.0);
     }
 
     cv::imshow(winTitle, iFrame);
