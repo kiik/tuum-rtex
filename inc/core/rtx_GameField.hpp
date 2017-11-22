@@ -18,7 +18,11 @@ using namespace tuum;
 
 namespace rtx {
 
-  typedef std::vector<Ball> BallSet;
+  typedef boost::shared_ptr<Ball> BallHandle;
+  typedef std::vector<BallHandle> BallSet;
+
+  typedef boost::shared_ptr<Goal> GoalHandle;
+  typedef std::vector<GoalHandle> GoalSet;
 
   class GameField
   {
@@ -26,6 +30,9 @@ namespace rtx {
     GameField();
 
     void tick();
+
+    void updateBalls();
+    void updateGoals();
 
     void digestBallBlob(cmv::blob_t&);
     void digestGoalBlob(cmv::blob_t&);
@@ -35,9 +42,12 @@ namespace rtx {
 
     void digestGoalMarkers(MarkerSet&, int, int);
 
+    BallSet* getBallsHandle() { return &mBalls; }
+    GoalSet* getGoalsHandle() { return &mGoals; }
+
     Entity* getAlly();
 
-    Ball* getNearestBall();
+    BallHandle getNearestBall();
 
     Goal* getAllyGoal();
     Goal* getOpponentGoal();
@@ -49,6 +59,8 @@ namespace rtx {
 
   private:
     BallSet mBalls;
+    GoalSet mGoals;
+
     Goal mG1_pink, mG2_blue;
 
     Vec2i mGoalPos;

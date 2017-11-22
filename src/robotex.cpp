@@ -29,13 +29,16 @@ namespace rtx {
 
   GameField *gGameField = nullptr;
 
+  tuum::Navigator *gNav = nullptr;
+
   cv::Mat frameBuffer;
 
   void setup() {
     rtx::object_detection_init();
     rtx::marker_detection_init();
 
-    gSys.insmod(new tuum::Navigator());
+    gNav = new tuum::Navigator();
+    gSys.insmod(gNav);
 
     gGameField = new GameField();
 
@@ -45,8 +48,13 @@ namespace rtx {
   void process() {
     hal::hw.readFrame(frameBuffer);
 
+    rtx::cmv_ui_set_nav(gNav->getContext());
+    rtx::cmv_ui(frameBuffer, gGameField);
+
     rtx::object_detection(frameBuffer, gGameField);
-    rtx::marker_detection(frameBuffer, gGameField);
+    // rtx::marker_detection(frameBuffer, gGameField);
+
+    gGameField->tick();
 
     Basketball::process();
   }

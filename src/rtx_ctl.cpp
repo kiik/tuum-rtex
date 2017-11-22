@@ -199,7 +199,7 @@ namespace rtx {
 
   // Navigate to ball
   void LSBallNavigator::init() {
-    Ball* b = gGameField->getNearestBall();
+    BallHandle b = gGameField->getNearestBall();
 
     if(b != nullptr)
       printf("[LSBallNavigator]Begin nav to %s\n", b->toString().c_str());
@@ -210,7 +210,7 @@ namespace rtx {
   int LSBallNavigator::run() {
     tuum::Navigator *gNav = (tuum::Navigator*)gSystem->findSubsystem(Navigator::GetType());
 
-    Ball* b = nullptr;
+    BallHandle b = nullptr;
 
     // if(mb->getBallSensorState()) goto OK;
     if(gGameField->countValidBalls() <= 0) goto ERR;
@@ -267,7 +267,7 @@ ERR:
   int LSBallPicker::run() {
     tuum::Navigator *gNav = (tuum::Navigator*)gSystem->findSubsystem(Navigator::GetType());
 
-    Ball* b = nullptr;
+    BallHandle b = nullptr;
 
     // if(mb->getBallSensorState()) goto OK;
     if(gGameField->countValidBalls() <= 0) goto ERR;
@@ -314,7 +314,7 @@ ERR:
   bool LSBallPicker::isRunnable() {
     if(mb->getBallSensorState()) return true;
 
-    Ball* b = gGameField->getNearestBall();
+    BallHandle b = gGameField->getNearestBall();
     if(b == nullptr) return false;
 
     Transform* t = Localization::getTransform();
@@ -456,7 +456,7 @@ ERR:
   }
 
   int LSGoalee::run() {
-    Ball* b = gGameField->getNearestBall();
+    BallHandle b = gGameField->getNearestBall();
 
     if(b != nullptr) {
       Vec2i pos = gGameField->calcBallPickupPos(b->getTransform()).getPosition();
@@ -643,7 +643,7 @@ ERR:
   int LSPlacedBallInit::run() {
     //Move to ball until 500mm away
 
-    /*Ball* b = gNavigation->getNearestBall();
+    /*BallHandle b = gNavigation->getNearestBall();
 
     if(b != nullptr) {
       Vec2i pos = gNavigation->calcPerimeterPosition(b->getTransform(), 500).getPosition();

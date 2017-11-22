@@ -179,8 +179,8 @@ namespace cmv {
         // Stats
         blob_buf.area = r->area;
 
-        blob_buf.c_x = rint(r->cen_x + .5);
-        blob_buf.c_y = rint(r->cen_y + .5);
+        blob_buf.c_x = r->cen_x; // rint(r->cen_x + .5);
+        blob_buf.c_y = r->cen_y; // rint(r->cen_y + .5);
 
         // Rect
         blob_buf.left = r->x1;
