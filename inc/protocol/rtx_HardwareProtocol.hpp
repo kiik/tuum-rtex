@@ -34,6 +34,8 @@ namespace rtx {
     int doCoilKick(const json&);
     int getBallSensor();
 
+    int pitcherSet(const json&);
+
 
   private:
     std::map<std::string,ERoute> mRouteMap;

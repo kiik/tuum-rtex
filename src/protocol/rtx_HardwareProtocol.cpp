@@ -23,6 +23,11 @@ namespace rtx {
         {"Coil Charge", "/ch", {}},
         {"Coil Kick", "/kc", {}},
         {"Get Ball Sensor", "/bl", {}},
+
+        {"Pitcher Set", "/pitcher/set", {
+          {"Relative Speed", "v_p", WSType::WST_Integer},
+          {"Relative Angle", "a_p", WSType::WST_Integer}
+        }},
       },
       this
     })
@@ -42,7 +47,7 @@ namespace rtx {
       }
     }
 
-    if(r == ERoute::None) return -1;
+    // if(r == ERoute::None) return -1;
 
     switch(r) {
       case ERoute::SetDribbler:
@@ -54,6 +59,10 @@ namespace rtx {
       case ERoute::GetBallSensor:
         return getBallSensor();
     }
+
+    const std::string uri = m.dat[WSProtocol::JS_URI];
+
+    if(uri == "/pitcher/set") return pitcherSet(m.dat);
 
     return -2;
   }
@@ -94,6 +103,18 @@ namespace rtx {
     json res = {{"_r", "OK"}, {"v", v}};
     send(res);
     return 0;
+  }
+
+  int HardwareProtocol::pitcherSet(const json& dat)
+  {
+    auto res = json::object();
+
+    uint8_t v = dat["v_p"].get<uint8_t>();
+    uint8_t a = dat["a_p"].get<uint8_t>();
+
+    hal::hw.pitcherSet(v, a);
+
+    return send(res);
   }
 
 }
