@@ -123,8 +123,8 @@ namespace rtx {
 
   void GameField::digestGoalMarker(aruco::Marker& marker)
   {
-    printf("#TODO: ");
-    std::cout << marker << std::endl;
+    //printf("#TODO: ");
+    //std::cout << marker << std::endl;
   }
 
   void GameField::digestGoalMarkers(MarkerSet& markers, int W_2, int H)
