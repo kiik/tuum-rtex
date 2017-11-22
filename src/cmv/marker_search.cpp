@@ -59,22 +59,26 @@ namespace rtx {
 
   lap_timer_t marker_detection_tmr;
 
+  enum FrameType {
+    DEFAULT,
+    PS4EYE,
+  } frameType = PS4EYE;
+
   int load_camera_transform(cv::Size size)
   {
     const char* fp = "/cam.yml";
     const char* ps4_fp = "./ps4eye.yml";
 
-    /*
-    if(rtx::hal::frameType == rtx::hal::PS4EYE)
+    if(frameType == PS4EYE)
     {
       gCamParams.readFromXMLFile(ps4_fp);
     }
     else gCamParams.readFromXMLFile(fp);
-s
+
     if(gCamParams.isValid()) {
       gCamParams.resize(size);
       cam_params_avail = true;
-    }*/
+    }
 
     return 0;
   }
@@ -87,10 +91,15 @@ s
   int marker_detection(cv::Mat& input, GameField *gmField)
   {
     bool timing = false;
+
     cv::Size sz = input.size(); // cv::Size ~ {.width, .height}
 
+    if(!cam_params_avail) load_camera_transform(sz);
+
     if(timing) marker_detection_tmr.start();
+
     gDetector.detect(input, gMarkers);
+
     if(timing) {
       marker_detection_tmr.time();
       marker_detection_tmr.print();
@@ -99,15 +108,15 @@ s
     for(auto &marker : gMarkers)
     {
       gTrackers[marker.id].estimatePose(marker, gCamParams, gMarkerSize);
-      //TODO: gmField->digestGoalMarker(marker);
+      gmField->digestGoalMarker(marker);
     }
 
     return 0;
   }
 
-  void marker_detection_debug(cv::Mat& input)
+  void marker_detection_debug(cv::Mat& input, bool render_3d)
   {
-    bool render_3d = gCamParams.isValid() && gMarkerSize != -1;
+    if(!gCamParams.isValid() || gMarkerSize == -1) render_3d = false;
 
     Marker *ptr;
     for(unsigned int i=0;i < gMarkers.size(); i++) {

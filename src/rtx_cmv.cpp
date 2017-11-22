@@ -43,6 +43,7 @@ namespace rtx {
 
   struct debug_flags_t {
     bool rect_en_flag = false;
+    uint8_t marker_dbg_flag = 0;
   } gDebug;
 
   tuum::Navigator::ctx_t gNavCtx;
@@ -160,9 +161,15 @@ namespace rtx {
       cv::Size sz = iFrame.size();
       cv::Point P0(sz.width / 2, sz.height - robotPlaneOffset);
 
+      int H = 800;
+      int P0_x = 1280 / 2, P0_y = 100;
+
       if(gNavCtx.hasTarget())
       {
-        cv::Point tPos(gNavCtx.tPos.x, gNavCtx.tPos.y);
+        cv::Point tPos_local(gNavCtx.tPos.x, gNavCtx.tPos.y);
+        cv::Point tPos(tPos_local.x + P0_x, H - P0_y - tPos_local.y);
+        cv::Point aPos(gNavCtx.aPos.x + P0_x, H - P0_y - gNavCtx.aPos.y);
+
         cv::line(iFrame, P0, tPos, goldenRod, 2.5);
         cv::putText(iFrame, "T", tPos, FONT_HERSHEY_SIMPLEX, 0.4, cWhite, 1.4);
 
@@ -173,7 +180,9 @@ namespace rtx {
           o = gNavCtx.tOri;
         } else if(gNavCtx.hasAim())
         {
-          o = (gNavCtx.aPos - gNavCtx.tPos).getOrientation();
+          //FIXME: Use world coordinates
+          cv::Point dv = (aPos - tPos);
+          o = atan2(dv.y, dv.x);
         }
 
         if(o != 0.0)
@@ -194,7 +203,9 @@ namespace rtx {
 
       if(gNavCtx.hasAim())
       {
-        cv::Point aPos(gNavCtx.aPos.x, gNavCtx.aPos.y);
+        cv::Point aPos_world(gNavCtx.aPos.x, gNavCtx.aPos.y);
+        cv::Point aPos(aPos_world.x + P0_x, H - P0_y - aPos_world.y);
+
         cv::line(iFrame, P0, aPos, deepPink, 2.5);
         cv::putText(iFrame, "A", aPos, FONT_HERSHEY_SIMPLEX, 0.4, cWhite, 1.4);
       }
@@ -265,6 +276,12 @@ namespace rtx {
       }
     }
 
+    if(gDebug.marker_dbg_flag > 0)
+    {
+      bool r3d = gDebug.marker_dbg_flag >= 2 ? true : false;
+      rtx::marker_detection_debug(iFrame, r3d);
+    }
+
     cv::imshow(winTitle, iFrame);
 
     gInput._key = cv::waitKey(waitDelay);
@@ -273,9 +290,13 @@ namespace rtx {
     {
       waitDelay = (waitDelay >= 0 ? -1 : 1);
     }
-    else if(gInput._key == 'r')
+    else if(gInput._key == '1')
     {
       gDebug.rect_en_flag = !gDebug.rect_en_flag;
+    }
+    else if(gInput._key == '2')
+    {
+      gDebug.marker_dbg_flag = (gDebug.marker_dbg_flag + 1) % 3;
     }
   }
 

@@ -87,6 +87,7 @@ namespace rtx {
   {
     // printf("[GameField::digestGoalBlob]GOT: %s\n", bl.name.c_str());
 
+    //TODO: Apply T_undistort, T_cameraToWorld
     Blob blob(bl.name, {
       .rect = {bl.left, bl.top, bl.right, bl.bottom},
       .realArea = bl.area
@@ -118,6 +119,12 @@ namespace rtx {
   void GameField::digestGoalBlobs(BlobSet& bls)
   {
     for(auto &bl : bls) digestGoalBlob(bl);
+  }
+
+  void GameField::digestGoalMarker(aruco::Marker& marker)
+  {
+    printf("#TODO: ");
+    std::cout << marker << std::endl;
   }
 
   void GameField::digestGoalMarkers(MarkerSet& markers, int W_2, int H)

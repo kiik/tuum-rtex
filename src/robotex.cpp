@@ -49,8 +49,8 @@ namespace rtx {
     hal::hw.readFrame(frameBackBuffer);
     frameBackBuffer.copyTo(frameBuffer);
 
+    rtx::marker_detection(frameBuffer, gGameField);
     rtx::object_detection(frameBackBuffer, gGameField);
-    // rtx::marker_detection(frameBuffer, gGameField);
 
     gGameField->tick();
 

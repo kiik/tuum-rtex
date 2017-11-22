@@ -250,15 +250,16 @@ namespace rtx {
 
     if(bl != nullptr) {
       Transform t = gGameField->ballPickupPos(bl, gl);
+      auto apos = gl->getTransform()->getPosition();
 
       gNav->navTo(t.getPosition());
-      gNav->aim(gl->getTransform()->getPosition());
+      gNav->aim(apos);
 
       if(!gNav->isTargetAchieved()) {
         //Deprecated: if(!gNav->isRunning()) gNav->start();
         if(m_dbg_clk.tick())
         {
-          printf("[LSBallNavigator]Navigate to %s\n", bl->toString().c_str());
+          printf("[LSBallNavigator]Navigate to %s, aim (%i, %i)\n", bl->toString().c_str(), apos.x, apos.y);
         }
       } else {
         goto OK;

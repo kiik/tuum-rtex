@@ -40,6 +40,7 @@ namespace rtx {
     void digestBallBlobs(BlobSet&);
     void digestGoalBlobs(BlobSet&);
 
+    void digestGoalMarker(aruco::Marker&);
     void digestGoalMarkers(MarkerSet&, int, int);
 
     BallSet* getBallsHandle() { return &mBalls; }
