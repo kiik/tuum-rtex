@@ -22,40 +22,39 @@ namespace rtx {
   {
     updateBalls();
     updateGoals();
-
-    mG1_pink.tick();
-    mG1_pink.tick();
   }
 
   void GameField::updateBalls()
   {
     BallHandle ptr;
-    for(auto it = mBalls.begin(); it != mBalls.end(); ++it) {
+
+    auto it = mBalls.begin();
+    while(it != mBalls.end()) {
       ptr = *it;
 
       ptr->tick();
 
       if(ptr->deadFrameCount() >= 5)
       {
-        auto p = ptr->getBlob()->getCentroid();
-        mBalls.erase(it);
-      }
+        delete ptr;
+        it = mBalls.erase(it);
+      } else ++it;
     }
   }
 
   void GameField::updateGoals()
   {
     GoalHandle ptr;
-    for(auto it = mGoals.begin(); it != mGoals.end(); ++it) {
-      ptr = *it;
 
+    auto it = mGoals.begin();
+    while(it != mGoals.end()) {
       ptr->tick();
 
       if(ptr->deadFrameCount() >= 5)
       {
-        auto p = ptr->getBlob()->getCentroid();
-        mGoals.erase(it);
-      }
+        delete ptr;
+        it = mGoals.erase(it);
+      } else ++it;
     }
   }
 

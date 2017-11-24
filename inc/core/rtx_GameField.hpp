@@ -18,10 +18,10 @@ using namespace tuum;
 
 namespace rtx {
 
-  typedef boost::shared_ptr<Ball> BallHandle;
+  typedef Ball* BallHandle;
   typedef std::vector<BallHandle> BallSet;
 
-  typedef boost::shared_ptr<Goal> GoalHandle;
+  typedef Goal* GoalHandle;
   typedef std::vector<GoalHandle> GoalSet;
 
   class GameField
