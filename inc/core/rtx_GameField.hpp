@@ -60,6 +60,8 @@ namespace rtx {
 
     Transform ballPickupPos(BallHandle, GoalHandle);
 
+    void setCameraParams(cv::Mat camMx, cv::Mat distCoeff);
+
   private:
     BallSet mBalls;
     GoalSet mGoals;
@@ -71,6 +73,8 @@ namespace rtx {
 
     unsigned int m_goal_buf_N, m_goal_buf_ix;
     Vec2i *m_goal_buf, m_goal_avg, m_goal_stddev;
+
+    cv::Mat mCamMx, mDistCoeff;
   };
 
 }

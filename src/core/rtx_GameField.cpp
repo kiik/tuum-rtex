@@ -3,6 +3,8 @@
 
 #include "core/rtx_GameField.hpp"
 
+#include "rtx_cmv.hpp"
+
 namespace rtx {
 
   GameField::GameField():
@@ -60,24 +62,39 @@ namespace rtx {
     // printf("[GameField::digestBallBlob]GOT: %s\n", bl.name.c_str());
 
     //TODO: Apply undistortion, T_cameraToWorld
+    Transform tfm;
     Blob blob(bl.name, {
       .rect = {bl.left, bl.top, bl.right, bl.bottom},
       .realArea = bl.area
     });
+
+    // mCamMx, mDistCoeff
+
+    std::vector<cv::Point2f> vIn = {cv::Point2f(bl.c_x, bl.c_y)};
+    std::vector<cv::Point2f> vOut;
+
+    cv::undistortPoints(vIn, vOut, gCamMx, gDistCoeff);
+
+    // const cv::Mat T_cameraToWorld = cv::Mat();
+
+    cv::Point2f rPos = vOut[0];
+    tfm.setPosition({(int)rPos.x, (int)rPos.y});
+
+    printf("(%i, %i) -> (%.1f, %.1f)\n", bl.c_x, bl.c_y, rPos.x, rPos.y);
 
     for(auto &ball : mBalls)
     {
       // if(ball.matched()) continue;
 
       // Match blob to entity from last frame
-      if(ball->matchPercent(blob) > 0.5)
+      if(ball->matchPercent(tfm, blob) > 0.5)
       {
-        ball->match(blob);
+        ball->match(tfm, blob);
         return;
       }
     }
 
-    BallHandle nBallHandle(new Ball((const Blob&)blob));
+    BallHandle nBallHandle(new Ball(tfm, (const Blob&)blob));
 
     printf("[GameField::digestBallBlob]NEW Ball#%lu(%i, %i)\n", nBallHandle->getId(), bl.c_x, bl.c_y);
     mBalls.push_back(nBallHandle);
@@ -86,6 +103,7 @@ namespace rtx {
   void GameField::digestGoalBlob(cmv::blob_t& bl)
   {
     // printf("[GameField::digestGoalBlob]GOT: %s\n", bl.name.c_str());
+    Transform tfm;
 
     //TODO: Apply T_undistort, T_cameraToWorld
     Blob blob(bl.name, {
@@ -320,6 +338,14 @@ namespace rtx {
   {
     Transform out = *in;
     return out;
+  }
+
+  void GameField::setCameraParams(cv::Mat camMx, cv::Mat distCoeff)
+  {
+    printf("[GameField::setCameraParams]");
+    std::cout << camMx << ", " << distCoeff;
+    mCamMx = camMx;
+    mDistCoeff = distCoeff;
   }
 
 }
