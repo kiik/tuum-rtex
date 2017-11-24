@@ -306,6 +306,13 @@ namespace rtx {
     {
       gDebug.nav_dbg_flag = !gDebug.nav_dbg_flag;
     }
+
+    if(gInput._key == 'f')
+    {
+      const char* fp = "live-frame-dbg.png";
+      printf("Saving current frame to '%s'.\n", fp);
+      cv::imwrite(fp, iFrame);
+    }
   }
 
   int cmv_tests_main(int argc,char **argv)
