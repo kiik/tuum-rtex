@@ -53,7 +53,7 @@ namespace rtx {
     float ori = 0.0;
 
     Vec2f motionVector;
-    float velocity = 0, angularVelocity = 0;
+    float velocity = 0, heading = 0, angularVelocity = 0;
     time_ms_t _t0, _t1;
   } simRobot, robotCtl;
 
@@ -107,7 +107,7 @@ namespace rtx {
            deltaOrient = 0;
 
     deltaDistance += deltaPos.getMagnitude();       // Get motion distance
-    deltaOrient   += motionDelta.getOrientation();  // Get orientation error
+    deltaOrient   += motionDelta.getOrientation() * 180.0 / M_PI;  // Get orientation error
 
     velocityControl.SV = deltaDistance; // Set distance target
     orientControl.SV   = deltaOrient; // Set orientation target
@@ -121,15 +121,17 @@ namespace rtx {
 
     // Update simulation
     robotControlState->motionVector = deltaPos.getNormalized();
+    robotControlState->heading = deltaPos.getOrientation();
+
     robotControlState->velocity = velocity;
-    robotControlState->angularVelocity = angularVelocity;
+    robotControlState->angularVelocity = -1 * angularVelocity;
 
     // sim_tick(robotControlState);
 
-    printf("[rtx::motion_handler]input: {.deltaPos = (%i, %i), .deltaDistance = %.2f, .deltaOrient = %.2f}\n", deltaPos.x, deltaPos.y, deltaDistance, deltaOrient);
+    //printf("[rtx::motion_handler]input: {.deltaPos = (%i, %i), .deltaDistance = %.2f, .deltaOrient = %.2f}\n", deltaPos.x, deltaPos.y, deltaDistance, deltaOrient);
 
-    printf("[rtx::motion_handler]t=%lu, SV/deltaDistance=%.2f, PV=%.2f, PID/gVelocity=%.2f\n",
-      velocityControl._t, velocityControl.SV, velocityControl._lastProcessValue, velocityControl.out);
+    // printf("[rtx::motion_handler]t=%lu, SV/deltaDistance=%.2f, PV=%.2f, PID/gVelocity=%.2f\n",
+    //  velocityControl._t, velocityControl.SV, velocityControl._lastProcessValue, velocityControl.out);
 
     //printf("[rtx::motion_handler]t=%lu, SV/deltaOrient=%.2f, PV=%.2f, PID/gTurnVelocity=%.2f\n",
     //    orientControl._t, orientControl.SV, orientControl._lastProcessValue, orientControl.out);
@@ -137,8 +139,35 @@ namespace rtx {
 
     //printf("[rtx::motion_handler]#TODO omniDrive(%i, %.2f, %i)\n",
     //  velocity, motionDirection, angularVelocity);
+    tuum::hal::hw.getMotionControl()->omniDrive(robotControlState->velocity, robotControlState->heading, robotControlState->angularVelocity);
 
     return 0;
+  }
+
+  void cmv_render_ui(cv::Mat& frameBuffer)
+  {
+    {
+      cv::Point p0(robotControlState->pos.x, robotControlState->pos.y);
+      cv::putText(frameBuffer, "SIM", p0, cv::FONT_HERSHEY_SIMPLEX, 0.6, cv::Scalar(255, 255, 0), 1.4);
+
+      p0 = cv::Point(10, 25);
+      std::string label = tuum::format("<simRobot {.v = %i, .a = %.2f, .r_v = %i}>", robotControlState->velocity, robotControlState->heading, robotControlState->angularVelocity);
+      cv::putText(frameBuffer, label.c_str(), p0, cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(57, 255, 20), 1.4);
+
+      p0.y += 15;
+
+      std::stringstream ss;
+      ss << "{.T_cToW = " << gCamMx << "; "
+         << "T_udistort = " << gDistCoeff;
+
+      label = ss.str(); // tuum::format("%s, %s}", gCamMx.toString().c_str(), gDistCoeff.toString().c_str());
+      cv::putText(frameBuffer, label.c_str(), p0, cv::FONT_HERSHEY_SIMPLEX, 0.3, cv::Scalar(57, 255, 20), 1.4);
+    }
+
+    auto ctx = gNav->getContext();
+
+    rtx::cmv_ui_set_nav(ctx);
+    rtx::cmv_ui(frameBuffer, gGameField);
   }
 
   int init()
@@ -167,38 +196,19 @@ namespace rtx {
     gSys.process();
 
     hal::hw.readFrame(frameBackBuffer);
-    frameBackBuffer = misc::resize2(frameBackBuffer, 1280);
-    frameBackBuffer.copyTo(frameBuffer);
+    // frameBackBuffer = misc::resize2(frameBackBuffer, 1280);
+    // frameBackBuffer.copyTo(frameBuffer);
 
-    rtx::marker_detection(frameBuffer, gGameField);
+    rtx::marker_detection(frameBackBuffer, gGameField);
+    cv::imshow("back", frameBackBuffer);
     rtx::object_detection(frameBackBuffer, gGameField);
+
 
     gGameField->tick();
 
     Basketball::process();
 
-    auto ctx = gNav->getContext();
-
-    {
-      cv::Point p0(simRobot.pos.x, simRobot.pos.y);
-      cv::putText(frameBuffer, "SIM", p0, cv::FONT_HERSHEY_SIMPLEX, 0.6, cv::Scalar(255, 255, 0), 1.4);
-
-      p0 = cv::Point(10, 25);
-      std::string label = tuum::format("<simRobot {.v = %i, .a = %.2f, .r_v = %i}>", simRobot.velocity, simRobot.motionVector.getMagnitude(), simRobot.angularVelocity);
-      cv::putText(frameBuffer, label.c_str(), p0, cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(57, 255, 20), 1.4);
-
-      p0.y += 15;
-
-      std::stringstream ss;
-      ss << "{.T_cToW = " << gCamMx << "; "
-         << "T_udistort = " << gDistCoeff;
-
-      label = ss.str(); // tuum::format("%s, %s}", gCamMx.toString().c_str(), gDistCoeff.toString().c_str());
-      cv::putText(frameBuffer, label.c_str(), p0, cv::FONT_HERSHEY_SIMPLEX, 0.3, cv::Scalar(57, 255, 20), 1.4);
-    }
-
-    rtx::cmv_ui_set_nav(ctx);
-    rtx::cmv_ui(frameBuffer, gGameField);
+    // cmv_render_ui(frameBuffer)
   }
 
 }
