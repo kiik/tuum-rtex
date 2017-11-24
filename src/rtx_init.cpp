@@ -45,12 +45,11 @@ int main(int argc, char* argv[]) {
   tuum::lpx::init();
   tuum::lpx::setup();
 
-  rtx::gSys.setup();
+  rtx::init();
   rtx::setup();
 
   while(1) {
     hal::process();
-    rtx::gSys.process();
     rtx::process();
   }
 

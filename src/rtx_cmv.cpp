@@ -73,6 +73,7 @@ namespace rtx {
   }
 
   const int robotPlaneOffset = 100, axisPadding = 20, unitStep = 100, unitBarSize_2 = 10;
+  cv::Mat oFrame;
 
   void cmv_ui_draw_axis(cv::Mat& iFrame)
   {
@@ -282,7 +283,8 @@ namespace rtx {
       rtx::marker_detection_debug(iFrame, r3d);
     }
 
-    cv::imshow(winTitle, iFrame);
+    oFrame = misc::resize(iFrame, 1280);
+    cv::imshow(winTitle, oFrame);
 
     gInput._key = cv::waitKey(waitDelay);
 
