@@ -33,10 +33,11 @@ namespace rtx {
     for(auto it = mBalls.begin(); it != mBalls.end(); ++it) {
       ptr = *it;
 
+      ptr->tick();
+
       if(ptr->deadFrameCount() >= 5)
       {
         auto p = ptr->getBlob()->getCentroid();
-        printf("LOST Ball#%lu(%i, %i)\n", ptr->getId(), p.x, p.y);
         mBalls.erase(it);
       }
     }
@@ -48,10 +49,11 @@ namespace rtx {
     for(auto it = mGoals.begin(); it != mGoals.end(); ++it) {
       ptr = *it;
 
+      ptr->tick();
+
       if(ptr->deadFrameCount() >= 5)
       {
         auto p = ptr->getBlob()->getCentroid();
-        printf("LOST Goal#%lu(%i, %i)\n", ptr->getId(), p.x, p.y);
         mGoals.erase(it);
       }
     }
@@ -59,8 +61,6 @@ namespace rtx {
 
   void GameField::digestBallBlob(cmv::blob_t& bl)
   {
-    // printf("[GameField::digestBallBlob]GOT: %s\n", bl.name.c_str());
-
     //TODO: Apply undistortion, T_cameraToWorld
     Transform tfm;
     Blob blob(bl.name, {
@@ -97,13 +97,11 @@ namespace rtx {
 
     BallHandle nBallHandle(new Ball(tfm, (const Blob&)blob));
 
-    printf("[GameField::digestBallBlob]NEW Ball#%lu(%i, %i)\n", nBallHandle->getId(), bl.c_x, bl.c_y);
     mBalls.push_back(nBallHandle);
   }
 
   void GameField::digestGoalBlob(cmv::blob_t& bl)
   {
-    // printf("[GameField::digestGoalBlob]GOT: %s\n", bl.name.c_str());
     Transform tfm;
 
     //TODO: Apply T_undistort, T_cameraToWorld
@@ -131,7 +129,6 @@ namespace rtx {
 
     GoalHandle nGoalHandle(new Goal(tfm, (const Blob&)blob));
 
-    printf("[GameField::digestGoalBlob]NEW Goal#%lu(%i, %i)\n", nGoalHandle->getId(), bl.c_x, bl.c_y);
     mGoals.push_back(nGoalHandle);
   }
 
