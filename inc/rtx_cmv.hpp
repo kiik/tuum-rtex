@@ -11,6 +11,8 @@ namespace rtx {
 
   class GameField;
 
+  extern cv::Mat gCamMx, gDistCoeff;
+
   void cmv_ui_set_nav(tuum::Navigator::ctx_t);
 
   void cmv_ui(cv::Mat&, GameField*);

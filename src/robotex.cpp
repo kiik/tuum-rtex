@@ -146,13 +146,14 @@ namespace rtx {
     rtx::object_detection_init();
     rtx::marker_detection_init();
 
+    gGameField = new GameField();
+    gGameField->setCameraParams(gCamMx, gDistCoeff);
+
     gNav = new tuum::Navigator();
     gSys.insmod(gNav);
 
     motion_handler_init();
     gNav->setMotionHandler(motion_handler);
-
-    gGameField = new GameField();
   }
 
   void setup()
@@ -181,10 +182,23 @@ namespace rtx {
     {
       cv::Point p0(simRobot.pos.x, simRobot.pos.y);
       cv::putText(frameBuffer, "SIM", p0, cv::FONT_HERSHEY_SIMPLEX, 0.6, cv::Scalar(255, 255, 0), 1.4);
+
+      p0 = cv::Point(10, 25);
+      std::string label = tuum::format("<simRobot {.v = %i, .a = %.2f, .r_v = %i}>", simRobot.velocity, simRobot.motionVector.getMagnitude(), simRobot.angularVelocity);
+      cv::putText(frameBuffer, label.c_str(), p0, cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(57, 255, 20), 1.4);
+
+      p0.y += 15;
+
+      std::stringstream ss;
+      ss << "{.T_cToW = " << gCamMx << "; "
+         << "T_udistort = " << gDistCoeff;
+
+      label = ss.str(); // tuum::format("%s, %s}", gCamMx.toString().c_str(), gDistCoeff.toString().c_str());
+      cv::putText(frameBuffer, label.c_str(), p0, cv::FONT_HERSHEY_SIMPLEX, 0.3, cv::Scalar(57, 255, 20), 1.4);
     }
 
-    // rtx::cmv_ui_set_nav(ctx);
-    // rtx::cmv_ui(frameBuffer, gGameField);
+    rtx::cmv_ui_set_nav(ctx);
+    rtx::cmv_ui(frameBuffer, gGameField);
   }
 
 }

@@ -19,6 +19,8 @@
 
 #include "cmv/marker_search.hpp"
 
+#include "rtx_cmv.hpp"
+
 using namespace cv;
 using namespace std;
 using namespace aruco;
@@ -49,12 +51,15 @@ namespace rtx {
 
 namespace rtx {
 
+  cv::Mat gCamMx, gDistCoeff;
+
+  CameraParameters gCamParams;
+
   MarkerDetector gDetector;
   MarkerSet gMarkers;
   std::map<uint32_t, MarkerPoseTracker> gTrackers;
 
   float gMarkerSize = 0.1475; // 147.5mm
-  CameraParameters gCamParams;
   bool cam_params_avail = false;
 
   lap_timer_t marker_detection_tmr;
@@ -78,6 +83,10 @@ namespace rtx {
     if(gCamParams.isValid()) {
       gCamParams.resize(size);
       cam_params_avail = true;
+
+      printf("UPDATE GLOBAL CAMERA PARAMS %i,%i\n", size.width, size.height);
+      gCamMx = gCamParams.CameraMatrix;
+      gDistCoeff = gCamParams.Distorsion;
     }
 
     return 0;
