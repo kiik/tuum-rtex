@@ -15,6 +15,7 @@ namespace rtx {
   extern RobotexCommSrv gCommSrv;
   extern GameField* gGameField;
 
+  int init();
   void setup();
   void process();
 
