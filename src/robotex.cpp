@@ -55,7 +55,9 @@ namespace rtx {
     Vec2f motionVector;
     float velocity = 0, angularVelocity = 0;
     time_ms_t _t0, _t1;
-  } simRobot;
+  } simRobot, robotCtl;
+
+  robot_state_t *robotControlState = &robotCtl;
 
   void motion_handler_init()
   {
@@ -69,31 +71,31 @@ namespace rtx {
     libPID.set_limit(-45, 45, &orientControl);
     libPID.set_period_ms(1000 / 50, &orientControl);
 
-    velocityControl._direction = PID_REVERSE;
-    orientControl._direction = PID_REVERSE;
+    // velocityControl._direction = PID_REVERSE;
+    // orientControl._direction = PID_REVERSE;
 
-    simRobot._t0 = millis();
+    robotControlState->_t0 = millis();
   }
 
-  void sim_tick(robot_state_t& iState)
+  void sim_tick(robot_state_t* iState)
   {
-    iState._t1 = millis();
+    iState->_t1 = millis();
 
-    time_ms_t dt_ms = iState._t1 - iState._t0;
+    time_ms_t dt_ms = iState->_t1 - iState->_t0;
 
     if(dt_ms < 30) return;
 
     double dt = dt_ms / 1000.0;
 
     // Do simulation step
-    Vec2f mvec = iState.motionVector * (dt * iState.velocity);
+    Vec2f mvec = iState->motionVector * (dt * iState->velocity);
 
     printf("mvec =(%.2f, %.2f)\n", mvec.x, mvec.y);
 
-    iState.pos += Vec2i(mvec.x, mvec.y);
-    iState.ori += dt * iState.angularVelocity;
+    iState->pos += Vec2i(mvec.x, mvec.y);
+    iState->ori += dt * iState->angularVelocity;
 
-    iState._t0 = iState._t1;
+    iState->_t0 = iState->_t1;
   }
 
   int motion_handler(Transform motionDelta)
@@ -101,30 +103,28 @@ namespace rtx {
     // Velocity update step
     auto deltaPos = motionDelta.getPosition();
 
-    double deltaDistance,
-           deltaOrient   = (motionDelta.getOrientation() - (M_PI / 2.0))  * 180.0 / M_PI; // T_globalToLocal
+    double deltaDistance = 0,
+           deltaOrient = 0;
 
-    velocityControl.SV = 0; // Set distance target
-    orientControl.SV = 0;
+    deltaDistance += deltaPos.getMagnitude();       // Get motion distance
+    deltaOrient   += motionDelta.getOrientation();  // Get orientation error
 
-    // Apply simulation
-    deltaDistance += (deltaPos + simRobot.pos).getMagnitude();
-    deltaOrient   += simRobot.ori;
+    velocityControl.SV = deltaDistance; // Set distance target
+    orientControl.SV   = deltaOrient; // Set orientation target
 
     // PID Update. Relative input -> pid sv = 0
-    libPID.pid_tick(deltaDistance, &velocityControl);
-    libPID.pid_tick(deltaOrient, &orientControl);
+    libPID.pid_tick(0, &velocityControl);
+    libPID.pid_tick(0, &orientControl);
 
     // Retrieve calculated velocities
     int16_t velocity = velocityControl.out, angularVelocity = orientControl.out;
-    float motionDirection = deltaPos.getOrientation() - (M_PI / 2.0);
 
     // Update simulation
-    simRobot.motionVector = deltaPos.getNormalized();
-    simRobot.velocity = velocity;
-    simRobot.angularVelocity = angularVelocity;
+    robotControlState->motionVector = deltaPos.getNormalized();
+    robotControlState->velocity = velocity;
+    robotControlState->angularVelocity = angularVelocity;
 
-    sim_tick(simRobot);
+    // sim_tick(robotControlState);
 
     printf("[rtx::motion_handler]input: {.deltaPos = (%i, %i), .deltaDistance = %.2f, .deltaOrient = %.2f}\n", deltaPos.x, deltaPos.y, deltaDistance, deltaOrient);
 

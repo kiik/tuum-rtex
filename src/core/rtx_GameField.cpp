@@ -70,17 +70,18 @@ namespace rtx {
 
     // mCamMx, mDistCoeff
 
-    std::vector<cv::Point2f> vIn = {cv::Point2f(bl.c_x, bl.c_y)};
-    std::vector<cv::Point2f> vOut;
+    std::vector<cv::Point2d> vIn = {cv::Point2d(bl.c_x, bl.c_y)};
+    std::vector<cv::Point2d> vOut;
 
     cv::undistortPoints(vIn, vOut, gCamMx, gDistCoeff);
+    cv::Point2d rPos = vOut[0];
 
-    // const cv::Mat T_cameraToWorld = cv::Mat();
+    const int W_2 = 1280 / 2, H = 800;
 
-    cv::Point2f rPos = vOut[0];
-    tfm.setPosition({(int)rPos.x, (int)rPos.y});
+    //TODO: Apply camera to world transformation
+    tfm.setPosition({H - bl.c_y, W_2 - bl.c_x});
 
-    printf("(%i, %i) -> (%.1f, %.1f)\n", bl.c_x, bl.c_y, rPos.x, rPos.y);
+    // printf("(%i, %i) -> (%.6f, %.6f)\n", bl.c_x, bl.c_y, rPos.x, rPos.y);
 
     for(auto &ball : mBalls)
     {
@@ -111,19 +112,24 @@ namespace rtx {
       .realArea = bl.area
     });
 
+    const int W_2 = 1280 / 2, H = 800;
+
+    //TODO: Apply camera to world transformation
+    tfm.setPosition({H - bl.c_y, W_2 - bl.bottom});
+
     const float matchCondition = 0.5;
 
     for(auto &goal : mGoals)
     {
       // Match blob to entity from last frame
-      if(goal->matchPercent(blob) > matchCondition)
+      if(goal->matchPercent(tfm, blob) > matchCondition)
       {
-        goal->match(blob);
+        goal->match(tfm, blob);
         return;
       }
     }
 
-    GoalHandle nGoalHandle(new Goal((const Blob&)blob));
+    GoalHandle nGoalHandle(new Goal(tfm, (const Blob&)blob));
 
     printf("[GameField::digestGoalBlob]NEW Goal#%lu(%i, %i)\n", nGoalHandle->getId(), bl.c_x, bl.c_y);
     mGoals.push_back(nGoalHandle);

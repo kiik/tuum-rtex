@@ -250,16 +250,18 @@ namespace rtx {
 
     if(bl != nullptr) {
       Transform t = gGameField->ballPickupPos(bl, gl);
-      auto apos = gl->getTransform()->getPosition();
+      Vec2i apos;
 
-      gNav->navTo(t.getPosition());
-      gNav->aim(apos);
+      if(gl) apos = gl->getTransform()->getPosition();
+      else apos = bl->getTransform()->getPosition();
+
+      gNav->navTo(t.getPosition(), apos.getOrientation());
 
       if(!gNav->isTargetAchieved()) {
         //Deprecated: if(!gNav->isRunning()) gNav->start();
         if(m_dbg_clk.tick())
         {
-          printf("[LSBallNavigator]Navigate to %s, aim (%i, %i)\n", bl->toString().c_str(), apos.x, apos.y);
+          printf("[LSBallNavigator]Navigate to %s. Aim at (%i, %i)\n", bl->toString().c_str(), apos.x, apos.y);
         }
       } else {
         goto OK;
