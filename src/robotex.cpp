@@ -183,8 +183,8 @@ namespace rtx {
       cv::putText(frameBuffer, "SIM", p0, cv::FONT_HERSHEY_SIMPLEX, 0.6, cv::Scalar(255, 255, 0), 1.4);
     }
 
-    rtx::cmv_ui_set_nav(ctx);
-    rtx::cmv_ui(frameBuffer, gGameField);
+    // rtx::cmv_ui_set_nav(ctx);
+    // rtx::cmv_ui(frameBuffer, gGameField);
   }
 
 }
