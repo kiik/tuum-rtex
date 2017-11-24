@@ -42,7 +42,7 @@ namespace rtx {
   } gInput;
 
   struct debug_flags_t {
-    bool rect_en_flag = false, nav_dbg_flag = true;
+    bool rect_en_flag = false, nav_dbg_flag = true, axis_dbg_flag = true;
     uint8_t marker_dbg_flag = 0;
   } gDebug;
 
@@ -147,7 +147,8 @@ namespace rtx {
       cmv_ui_init = true;
     }
 
-    cmv_ui_draw_axis(iFrame);
+    if(gDebug.axis_dbg_flag)
+      cmv_ui_draw_axis(iFrame);
 
     const cv::Scalar lightGray(211, 211, 211);
     const cv::Scalar goldenRod(32, 165, 218);
@@ -305,6 +306,9 @@ namespace rtx {
     } else if(gInput._key == '3')
     {
       gDebug.nav_dbg_flag = !gDebug.nav_dbg_flag;
+    } else if(gInput._key == '4')
+    {
+      gDebug.axis_dbg_flag = !gDebug.axis_dbg_flag;
     }
 
     if(gInput._key == 'f')
