@@ -328,11 +328,16 @@ namespace rtx {
   {
     Transform out;
 
-    auto p0 = bl->getTransform()->getPosition(),
-         p1 = gl->getTransform()->getPosition();
+    Vec2i p0 = bl->getTransform()->getPosition(), p1;
 
-    Vec2D<double> avec = (p1 - p0).getNormalized();
-    Vec2i pvec = p0 - avec * 55;
+    Vec2i pvec;
+    Vec2D<double> avec;
+
+    if(gl) p1 = gl->getTransform()->getPosition();
+    else p1 = bl->getTransform()->getPosition() * 2.0;
+
+    avec = (p1 - p0).getNormalized();
+    pvec = p0 - avec * 55;
 
     out.setPosition(pvec);
     out.setOrientation(avec.getOrientation());
