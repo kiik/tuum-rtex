@@ -42,7 +42,7 @@ namespace rtx {
   } gInput;
 
   struct debug_flags_t {
-    bool rect_en_flag = false;
+    bool rect_en_flag = false, nav_dbg_flag = true;
     uint8_t marker_dbg_flag = 0;
   } gDebug;
 
@@ -158,120 +158,123 @@ namespace rtx {
     const cv::Scalar cRed(0, 0, 255);
     const cv::Scalar cGreen(0, 255, 0);
 
+    if(gDebug.nav_dbg_flag)
     {
-      cv::Size sz = iFrame.size();
-      cv::Point P0(sz.width / 2, sz.height - robotPlaneOffset);
-
-      int H = 800;
-      int P0_x = 1280 / 2, P0_y = 100;
-
-      if(gNavCtx.hasTarget())
       {
-        cv::Point tPos_local(gNavCtx.tPos.x, gNavCtx.tPos.y);
-        cv::Point tPos(tPos_local.x + P0_x, H - P0_y - tPos_local.y);
-        cv::Point aPos(gNavCtx.aPos.x + P0_x, H - P0_y - gNavCtx.aPos.y);
+        cv::Size sz = iFrame.size();
+        cv::Point P0(sz.width / 2, sz.height - robotPlaneOffset);
 
-        cv::line(iFrame, P0, tPos, goldenRod, 2.5);
-        cv::putText(iFrame, "T", tPos, FONT_HERSHEY_SIMPLEX, 0.4, cWhite, 1.4);
+        int H = 800;
+        int P0_x = 1280 / 2, P0_y = 100;
 
-        float o = 0.0;
-
-        if(gNavCtx.hasOrient())
+        if(gNavCtx.hasTarget())
         {
-          o = gNavCtx.tOri;
-        } else if(gNavCtx.hasAim())
-        {
-          //FIXME: Use world coordinates
-          cv::Point dv = (aPos - tPos);
-          o = atan2(dv.y, dv.x);
-        }
+          cv::Point tPos_local(gNavCtx.tPos.x, gNavCtx.tPos.y);
+          cv::Point tPos(tPos_local.x + P0_x, H - P0_y - tPos_local.y);
+          cv::Point aPos(gNavCtx.aPos.x + P0_x, H - P0_y - gNavCtx.aPos.y);
 
-        if(o != 0.0)
-        {
-          const int L = 50;
-          cv::Point ovec(cos(o) * L, sin(o) * L);
+          cv::line(iFrame, P0, tPos, goldenRod, 2.5);
+          cv::putText(iFrame, "T", tPos, FONT_HERSHEY_SIMPLEX, 0.4, cWhite, 1.4);
 
-          cv::Point oPos = tPos + ovec;
-          cv::line(iFrame, tPos, oPos, cRed, 1.0);
+          float o = 0.0;
 
-          ovec = cv::Point(cos(o + 1.57) * L, sin(o + 1.57) * L);
-          oPos = tPos + ovec;
-          cv::line(iFrame, tPos, oPos, cGreen, 1.0);
-
-          cv::putText(iFrame, "O", oPos, FONT_HERSHEY_SIMPLEX, 0.4, cWhite, 1.4);
-        }
-      }
-
-      if(gNavCtx.hasAim())
-      {
-        cv::Point aPos_world(gNavCtx.aPos.x, gNavCtx.aPos.y);
-        cv::Point aPos(aPos_world.x + P0_x, H - P0_y - aPos_world.y);
-
-        cv::line(iFrame, P0, aPos, deepPink, 2.5);
-        cv::putText(iFrame, "A", aPos, FONT_HERSHEY_SIMPLEX, 0.4, cWhite, 1.4);
-      }
-
-      int r = 55 / 2;
-
-      cv::circle(iFrame, gInput.mousePosition, r, lightGray);
-      cv::putText(iFrame, "X", gInput.mousePosition - cv::Point(5, -5), FONT_HERSHEY_SIMPLEX, 0.4, Scalar(0, 0, 255), 2.0);
-    }
-
-    {
-      cv::Size sz = iFrame.size();
-      cv::Point P0(sz.width / 2, sz.height - robotPlaneOffset);
-
-      const cv::Scalar neonGreen(0, 255, 57);
-
-      BallSet *bls = gmField->getBallsHandle();
-
-      if(bls != nullptr)
-      {
-        for(auto &bl : *bls)
-        {
-          tuum::Vec2i _pos = bl->getBlob()->getCentroid();
-          cv::Vec2i pos = cv::Vec2i(_pos.x, _pos.y);
-          auto rect = bl->getBlob()->getRect();
-
-          const std::string label = bl->toString(); // tuum::format("B#%lu(%i,%i)", bl->getId(), pos[0], pos[1]);
-
-          cv::line(iFrame, P0, pos, lightGray, 1.0);
-
-          cv::putText(iFrame, label, pos,FONT_HERSHEY_SIMPLEX, 0.35, Scalar(0,0,0,255),2.0);
-          cv::putText(iFrame, label, pos,FONT_HERSHEY_SIMPLEX, 0.35, Scalar(255,255,255,255),1.7);
-
-          if(gDebug.rect_en_flag)
+          if(gNavCtx.hasOrient())
           {
-            cv::rectangle(iFrame, cv::Point(rect.x0, rect.y0), cv::Point(rect.x1, rect.y1), neonGreen);
+            o = gNavCtx.tOri;
+          } else if(gNavCtx.hasAim())
+          {
+            //FIXME: Use world coordinates
+            cv::Point dv = (aPos - tPos);
+            o = atan2(dv.y, dv.x);
+          }
+
+          if(o != 0.0)
+          {
+            const int L = 50;
+            cv::Point ovec(cos(o) * L, sin(o) * L);
+
+            cv::Point oPos = tPos + ovec;
+            cv::line(iFrame, tPos, oPos, cRed, 1.0);
+
+            ovec = cv::Point(cos(o + 1.57) * L, sin(o + 1.57) * L);
+            oPos = tPos + ovec;
+            cv::line(iFrame, tPos, oPos, cGreen, 1.0);
+
+            cv::putText(iFrame, "O", oPos, FONT_HERSHEY_SIMPLEX, 0.4, cWhite, 1.4);
+          }
+        }
+
+        if(gNavCtx.hasAim())
+        {
+          cv::Point aPos_world(gNavCtx.aPos.x, gNavCtx.aPos.y);
+          cv::Point aPos(aPos_world.x + P0_x, H - P0_y - aPos_world.y);
+
+          cv::line(iFrame, P0, aPos, deepPink, 2.5);
+          cv::putText(iFrame, "A", aPos, FONT_HERSHEY_SIMPLEX, 0.4, cWhite, 1.4);
+        }
+
+        int r = 55 / 2;
+
+        cv::circle(iFrame, gInput.mousePosition, r, lightGray);
+        cv::putText(iFrame, "X", gInput.mousePosition - cv::Point(5, -5), FONT_HERSHEY_SIMPLEX, 0.4, Scalar(0, 0, 255), 2.0);
+      }
+
+      {
+        cv::Size sz = iFrame.size();
+        cv::Point P0(sz.width / 2, sz.height - robotPlaneOffset);
+
+        const cv::Scalar neonGreen(0, 255, 57);
+
+        BallSet *bls = gmField->getBallsHandle();
+
+        if(bls != nullptr)
+        {
+          for(auto &bl : *bls)
+          {
+            tuum::Vec2i _pos = bl->getBlob()->getCentroid();
+            cv::Vec2i pos = cv::Vec2i(_pos.x, _pos.y);
+            auto rect = bl->getBlob()->getRect();
+
+            const std::string label = bl->toString(); // tuum::format("B#%lu(%i,%i)", bl->getId(), pos[0], pos[1]);
+
+            cv::line(iFrame, P0, pos, lightGray, 1.0);
+
+            cv::putText(iFrame, label, pos,FONT_HERSHEY_SIMPLEX, 0.35, Scalar(0,0,0,255),2.0);
+            cv::putText(iFrame, label, pos,FONT_HERSHEY_SIMPLEX, 0.35, Scalar(255,255,255,255),1.7);
+
+            if(gDebug.rect_en_flag)
+            {
+              cv::rectangle(iFrame, cv::Point(rect.x0, rect.y0), cv::Point(rect.x1, rect.y1), neonGreen);
+            }
           }
         }
       }
-    }
 
-    {
-      cv::Size sz = iFrame.size();
-      cv::Point P0(sz.width / 2, sz.height - robotPlaneOffset);
-
-      GoalSet *gls = gmField->getGoalsHandle();
-
-      if(gls != nullptr)
       {
-        for(auto &gl : *gls)
+        cv::Size sz = iFrame.size();
+        cv::Point P0(sz.width / 2, sz.height - robotPlaneOffset);
+
+        GoalSet *gls = gmField->getGoalsHandle();
+
+        if(gls != nullptr)
         {
-          tuum::Vec2i _pos = gl->getBlob()->getCentroid();
-          cv::Vec2i pos = cv::Vec2i(_pos.x, gl->getBlob()->getRect().y1);
-          auto rect = gl->getBlob()->getRect();
-
-          const std::string label = gl->toString(); // tuum::format("G#%lu(%i,%i)", gl->getId(), pos[0], pos[1]);
-
-          cv::line(iFrame, P0, pos, skyBlue, 1.0);
-
-          cv::putText(iFrame, label, pos,FONT_HERSHEY_SIMPLEX, 0.35, Scalar(0,0,0,255),2.0);
-          cv::putText(iFrame, label, pos,FONT_HERSHEY_SIMPLEX, 0.35, Scalar(255,255,255,255),1.7);
-
-          if(gDebug.rect_en_flag)
+          for(auto &gl : *gls)
           {
-            cv::rectangle(iFrame, cv::Point(rect.x0, rect.y0), cv::Point(rect.x1, rect.y1), skyBlue);
+            tuum::Vec2i _pos = gl->getBlob()->getCentroid();
+            cv::Vec2i pos = cv::Vec2i(_pos.x, gl->getBlob()->getRect().y1);
+            auto rect = gl->getBlob()->getRect();
+
+            const std::string label = gl->toString(); // tuum::format("G#%lu(%i,%i)", gl->getId(), pos[0], pos[1]);
+
+            cv::line(iFrame, P0, pos, skyBlue, 1.0);
+
+            cv::putText(iFrame, label, pos,FONT_HERSHEY_SIMPLEX, 0.35, Scalar(0,0,0,255),2.0);
+            cv::putText(iFrame, label, pos,FONT_HERSHEY_SIMPLEX, 0.35, Scalar(255,255,255,255),1.7);
+
+            if(gDebug.rect_en_flag)
+            {
+              cv::rectangle(iFrame, cv::Point(rect.x0, rect.y0), cv::Point(rect.x1, rect.y1), skyBlue);
+            }
           }
         }
       }
@@ -299,6 +302,9 @@ namespace rtx {
     else if(gInput._key == '2')
     {
       gDebug.marker_dbg_flag = (gDebug.marker_dbg_flag + 1) % 3;
+    } else if(gInput._key == '3')
+    {
+      gDebug.nav_dbg_flag = !gDebug.nav_dbg_flag;
     }
   }
 
