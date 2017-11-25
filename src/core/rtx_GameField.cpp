@@ -31,13 +31,14 @@ namespace rtx {
     auto it = mBalls.begin();
     while(it != mBalls.end()) {
       ptr = *it;
-
       ptr->tick();
 
-      if(ptr->deadFrameCount() >= 5)
+      if(ptr->deadFrameCount() >= 4)
       {
-        delete ptr;
-        it = mBalls.erase(it);
+        mBalls.erase(it++);
+
+        if(ptr != nullptr) delete ptr;
+        else RTXLOG("Encountered nullptr!", LOG_ERR);
       } else ++it;
     }
   }
@@ -48,13 +49,16 @@ namespace rtx {
 
     auto it = mGoals.begin();
     while(it != mGoals.end()) {
+      ptr = *it;
       ptr->tick();
 
-      if(ptr->deadFrameCount() >= 5)
+      if(ptr->deadFrameCount() >= 4)
       {
-        delete ptr;
-        it = mGoals.erase(it);
-      } else ++it;
+        mGoals.erase(it++);
+
+        if(ptr != nullptr) delete ptr;
+        else RTXLOG("Encountered nullptr!", LOG_ERR);
+      } ++it;
     }
   }
 
@@ -94,7 +98,7 @@ namespace rtx {
       }
     }
 
-    BallHandle nBallHandle(new Ball(tfm, (const Blob&)blob));
+    BallHandle nBallHandle = new Ball(tfm, (const Blob&)blob);
 
     mBalls.push_back(nBallHandle);
   }
@@ -126,7 +130,7 @@ namespace rtx {
       }
     }
 
-    GoalHandle nGoalHandle(new Goal(tfm, (const Blob&)blob));
+    GoalHandle nGoalHandle = new Goal(tfm, (const Blob&)blob);
 
     mGoals.push_back(nGoalHandle);
   }

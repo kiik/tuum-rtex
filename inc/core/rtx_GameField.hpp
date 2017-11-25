@@ -66,7 +66,7 @@ namespace rtx {
     BallSet mBalls;
     GoalSet mGoals;
 
-    Goal mG1_pink, mG2_blue;
+    // Goal mG1_pink, mG2_blue;
 
     Vec2i mGoalPos;
     float mGoalConfidence;

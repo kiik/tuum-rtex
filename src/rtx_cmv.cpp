@@ -36,21 +36,49 @@ namespace misc {
 
 namespace rtx {
 
+  const cv::Scalar lightGray(211, 211, 211);
+  const cv::Scalar goldenRod(32, 165, 218);
+  const cv::Scalar deepPink(255, 20, 147);
+  const cv::Scalar skyBlue(255, 191, 0);
+  const cv::Scalar cWhite(255, 255, 255);
+  const cv::Scalar cBlack(0, 0, 0);
+  const cv::Scalar cRed(0, 0, 255);
+  const cv::Scalar cGreen(0, 255, 0);
+
+  struct thr_bounds_t {
+    uint8_t low[3] = {255, 255, 255};
+    uint8_t high[3] = {0, 0, 0};
+  } gThr;
+
   struct input_t {
-    int _ev, _key;
+    int _ev, _key = 0;
     cv::Point mousePosition;
   } gInput;
 
-  struct debug_flags_t {
-    bool rect_en_flag = false, nav_dbg_flag = true, axis_dbg_flag = true;
-    uint8_t marker_dbg_flag = 0;
-  } gDebug;
+  debug_flags_t gDebug;
 
   tuum::Navigator::ctx_t gNavCtx;
 
-  int waitDelay = -1;
+  const char *winTitle = "rtx::cmv_ui";
+  int waitDelay = 1;
 
   bool cmv_ui_init = false;
+
+  const int robotPlaneOffset = 100, axisPadding = 20, unitStep = 100, unitBarSize_2 = 10;
+
+  cv::Mat oFrame;
+
+  void cmv_ui_colorpick(int x, int y)
+  {
+    Vec3b pix = oFrame.at<Vec3b>(y, x);
+    printf("COLORPICK - Lab(%i, %i, %i)\n", pix[0], pix[1], pix[2]);
+
+    for(int i = 0; i < 3; ++i)
+    {
+      gThr.low[i] = min(gThr.low[i], pix[i]);
+      gThr.high[i] = max(gThr.high[i], pix[i]);
+    }
+  }
 
   void cmv_mouse_handler(int event, int x, int y, int flags, void* param)
   {
@@ -65,15 +93,16 @@ namespace rtx {
         break;
       case CV_EVENT_LBUTTONUP:
       {
-        // rtx::colorpick_debug(x, y);
         printf("M_LBTN_UP - pos=(%i, %i)\n", x, y);
+        cmv_ui_colorpick(x, y);
         break;
       }
+      case CV_EVENT_MOUSEWHEEL:
+      case CV_EVENT_MOUSEHWHEEL:
+        printf("WHEL %i\n", cv::getMouseWheelDelta(flags));
+        break;
     }
   }
-
-  const int robotPlaneOffset = 100, axisPadding = 20, unitStep = 100, unitBarSize_2 = 10;
-  cv::Mat oFrame;
 
   void cmv_ui_draw_axis(cv::Mat& iFrame)
   {
@@ -137,8 +166,6 @@ namespace rtx {
 
   void cmv_ui(cv::Mat& iFrame, GameField *gmField)
   {
-    const char *winTitle = "rtx::cmv_ui";
-
     if(!cmv_ui_init)
     {
       cv::namedWindow(winTitle, 1);
@@ -150,15 +177,6 @@ namespace rtx {
     if(gDebug.axis_dbg_flag)
       cmv_ui_draw_axis(iFrame);
 
-    const cv::Scalar lightGray(211, 211, 211);
-    const cv::Scalar goldenRod(32, 165, 218);
-    const cv::Scalar deepPink(255, 20, 147);
-    const cv::Scalar skyBlue(255, 191, 0);
-    const cv::Scalar cWhite(255, 255, 255);
-    const cv::Scalar cBlack(0, 0, 0);
-    const cv::Scalar cRed(0, 0, 255);
-    const cv::Scalar cGreen(0, 255, 0);
-
     if(gDebug.nav_dbg_flag)
     {
       {
@@ -166,25 +184,31 @@ namespace rtx {
         cv::Point P0(sz.width / 2, sz.height - robotPlaneOffset);
 
         int H = 800;
-        int P0_x = 1280 / 2, P0_y = 100;
+        int W_2 = 1280 / 2, P0_y = 100;
+        int P0_x = W_2;
 
         if(gNavCtx.hasTarget())
         {
-          cv::Point tPos_local(gNavCtx.tPos.x, gNavCtx.tPos.y);
-          cv::Point tPos(tPos_local.x + P0_x, H - P0_y - tPos_local.y);
-          cv::Point aPos(gNavCtx.aPos.x + P0_x, H - P0_y - gNavCtx.aPos.y);
+          cv::Point tPos_world(gNavCtx.tPos.x, gNavCtx.tPos.y);
+          cv::Point tPos(W_2 - tPos_world.y, H - tPos_world.x);
+
+          cv::Point aPos_world, aPos;
+
+          cv::Point mvec, oPos;
 
           cv::line(iFrame, P0, tPos, goldenRod, 2.5);
           cv::putText(iFrame, "T", tPos, FONT_HERSHEY_SIMPLEX, 0.4, cWhite, 1.4);
 
           float o = 0.0;
 
-          if(gNavCtx.hasOrient())
-          {
+          // Get orientation target
+          if(gNavCtx.hasOrient()) {
             o = gNavCtx.tOri;
-          } else if(gNavCtx.hasAim())
-          {
-            //FIXME: Use world coordinates
+          }
+          else if(gNavCtx.hasAim()) {
+            cv::Point aPos_world(gNavCtx.aPos.x, gNavCtx.aPos.y);
+            cv::Point aPos(W_2 - aPos_world.y, H - aPos_world.x);
+
             cv::Point dv = (aPos - tPos);
             o = atan2(dv.y, dv.x);
           }
@@ -192,23 +216,27 @@ namespace rtx {
           if(o != 0.0)
           {
             const int L = 50;
-            cv::Point ovec(cos(o) * L, sin(o) * L);
 
-            cv::Point oPos = tPos + ovec;
-            cv::line(iFrame, tPos, oPos, cRed, 1.0);
+            const float A = M_PI;
+            mvec = cv::Point(cos(o) * L, sin(o) * L);
 
-            ovec = cv::Point(cos(o + 1.57) * L, sin(o + 1.57) * L);
-            oPos = tPos + ovec;
-            cv::line(iFrame, tPos, oPos, cGreen, 1.0);
+            cv::line(iFrame, tPos, tPos + mvec, cRed, 1.0);
+            cv::putText(iFrame, "O", tPos + mvec, FONT_HERSHEY_SIMPLEX, 0.4, cWhite, 1.4);
 
-            cv::putText(iFrame, "O", oPos, FONT_HERSHEY_SIMPLEX, 0.4, cWhite, 1.4);
+            mvec = cv::Point(cos(o - 1.57) * L, sin(o - 1.57) * L);
+            cv::line(iFrame, tPos, tPos + mvec, cGreen, 1.0);
           }
+
+          // printf("(0)tPos World(%i, %i)/Frame(%i, %i)\n", tPos_world.x, tPos_world.y, tPos.x, tPos.y);
+          // printf("(0)aPos World(%i, %i)/Frame(%i, %i)\n", aPos_world.x, aPos_world.y, aPos.x, aPos.y);
         }
 
         if(gNavCtx.hasAim())
         {
           cv::Point aPos_world(gNavCtx.aPos.x, gNavCtx.aPos.y);
-          cv::Point aPos(aPos_world.x + P0_x, H - P0_y - aPos_world.y);
+          cv::Point aPos(W_2 - aPos_world.y, H - aPos_world.x);
+
+          printf("(1)aPos World(%i, %i)/Frame(%i, %i)\n", aPos_world.x, aPos_world.y, aPos.x, aPos.y);
 
           cv::line(iFrame, P0, aPos, deepPink, 2.5);
           cv::putText(iFrame, "A", aPos, FONT_HERSHEY_SIMPLEX, 0.4, cWhite, 1.4);
@@ -287,35 +315,72 @@ namespace rtx {
       rtx::marker_detection_debug(iFrame, r3d);
     }
 
-    oFrame = misc::resize(iFrame, 1280);
+    if(gDebug.thr_en_flag)
+    {
+      cv::cvtColor(iFrame, oFrame, CV_BGR2Lab);
+    }
+    else oFrame = misc::resize(iFrame, 1280);
     cv::imshow(winTitle, oFrame);
 
-    gInput._key = cv::waitKey(waitDelay);
+    unsigned char c = cv::waitKey(waitDelay);
 
-    if(gInput._key == 's')
+    if(isascii(c))
     {
-      waitDelay = (waitDelay >= 0 ? -1 : 1);
-    }
-    else if(gInput._key == '1')
-    {
-      gDebug.rect_en_flag = !gDebug.rect_en_flag;
-    }
-    else if(gInput._key == '2')
-    {
-      gDebug.marker_dbg_flag = (gDebug.marker_dbg_flag + 1) % 3;
-    } else if(gInput._key == '3')
-    {
-      gDebug.nav_dbg_flag = !gDebug.nav_dbg_flag;
-    } else if(gInput._key == '4')
-    {
-      gDebug.axis_dbg_flag = !gDebug.axis_dbg_flag;
-    }
+      gInput._key = c;
 
-    if(gInput._key == 'f')
-    {
-      const char* fp = "live-frame-dbg.png";
-      printf("Saving current frame to '%s'.\n", fp);
-      cv::imwrite(fp, iFrame);
+      if(gInput._key == '0')
+      {
+        printf("PAUSE/RESUME %i\n", waitDelay);
+        waitDelay = (waitDelay > 0 ? 0 : 1);
+      }
+      else if(gInput._key == '1')
+      {
+        gDebug.rect_en_flag = !gDebug.rect_en_flag;
+      }
+      else if(gInput._key == '2')
+      {
+        gDebug.marker_dbg_flag = (gDebug.marker_dbg_flag + 1) % 3;
+      }
+      else if(gInput._key == '3')
+      {
+        gDebug.nav_dbg_flag = !gDebug.nav_dbg_flag;
+      }
+      else if(gInput._key == '4')
+      {
+        gDebug.axis_dbg_flag = !gDebug.axis_dbg_flag;
+      }
+      else if(gInput._key == 'f')
+      {
+        const char* fp = "live-frame-dbg.png";
+        printf("Saving current frame to '%s'.\n", fp);
+        cv::imwrite(fp, iFrame);
+      }
+      else if(gInput._key == '5')
+      {
+        gDebug.stat_en_flag = !gDebug.stat_en_flag;
+      }
+      else if(gInput._key == '6')
+      {
+        if(!gDebug.thr_en_flag)
+        {
+          for(int i = 0; i < 3; ++i)
+          {
+            gThr.low[i] = 255;
+            gThr.high[i] = 0;
+          }
+        }
+        else
+        {
+          printf("THRESHOLD RANGE: ( ");
+          for(int i = 0; i < 3; ++i)
+          {
+            printf("%i:%i ", gThr.low[i], gThr.high[i]);
+          }
+          printf(")\n");
+        }
+
+        gDebug.thr_en_flag = !gDebug.thr_en_flag;
+      }
     }
   }
 
@@ -363,8 +428,6 @@ namespace rtx {
       }
 
     } while(key != 27);
-
-    cv::waitKey(0);
 
     // cv::imwrite("out.png", input);
     // img = cv::imread(argv[1]);

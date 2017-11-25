@@ -114,8 +114,9 @@ namespace rtx {
 
     hal::hw.pitcherSet(v, a);
 
-    res["relativeSpeed"] = v;
-    res["relativeAngle"] = a;
+    Vec2i vs = hal::hw.pitcherGet();
+    res["relativeSpeed"] = vs.x;
+    res["relativeAngle"] = vs.y;
 
     return send(res);
   }

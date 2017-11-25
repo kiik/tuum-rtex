@@ -9,6 +9,14 @@
 
 namespace rtx {
 
+  struct debug_flags_t {
+    bool rect_en_flag = false, nav_dbg_flag = true, axis_dbg_flag = true;
+    bool stat_en_flag = true, thr_en_flag = false;
+    uint8_t marker_dbg_flag = 0;
+  };
+
+  extern debug_flags_t gDebug;
+
   class GameField;
 
   extern cv::Mat gCamMx, gDistCoeff;
