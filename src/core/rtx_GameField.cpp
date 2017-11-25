@@ -35,7 +35,7 @@ namespace rtx {
 
       if(ptr->deadFrameCount() >= 4)
       {
-        mBalls.erase(it++);
+        it = mBalls.erase(it);
 
         if(ptr != nullptr) delete ptr;
         else RTXLOG("Encountered nullptr!", LOG_ERR);
@@ -54,11 +54,11 @@ namespace rtx {
 
       if(ptr->deadFrameCount() >= 4)
       {
-        mGoals.erase(it++);
+        it = mGoals.erase(it);
 
         if(ptr != nullptr) delete ptr;
         else RTXLOG("Encountered nullptr!", LOG_ERR);
-      } ++it;
+      } else ++it;
     }
   }
 
@@ -83,8 +83,7 @@ namespace rtx {
 
     //TODO: Apply camera to world transformation
     tfm.setPosition({H - bl.c_y, W_2 - bl.c_x});
-
-    // printf("(%i, %i) -> (%.6f, %.6f)\n", bl.c_x, bl.c_y, rPos.x, rPos.y);
+    Vec2i pos = tfm.getPosition();
 
     for(auto &ball : mBalls)
     {

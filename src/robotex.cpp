@@ -48,6 +48,8 @@ namespace rtx {
 
   tuum::pid_t velocityControl, orientControl;
 
+  soft_clk_t debug_clk;
+
   struct robot_state_t {
     Vec2i pos = Vec2i(0,0);
     float ori = 0.0;
@@ -61,13 +63,15 @@ namespace rtx {
 
   void motion_handler_init()
   {
+    debug_clk.init(500);
+
     libPID.init(&velocityControl);
-    libPID.set_tuning(1.6, 1.0, 0.1, &velocityControl);
-    libPID.set_limit(-100, 100, &velocityControl);
+    libPID.set_tuning(0.8, 0.5, 0.06, &velocityControl);
+    libPID.set_limit(-40, 40, &velocityControl);
     libPID.set_period_ms(1000 / 50, &velocityControl);
 
     libPID.init(&orientControl);
-    libPID.set_tuning(0.5, 0.0, 0.0, &orientControl);
+    libPID.set_tuning(1.0 / 400.0, 0.0, 0.0, &orientControl);
     libPID.set_limit(-45, 45, &orientControl);
     libPID.set_period_ms(1000 / 50, &orientControl);
 
@@ -106,7 +110,7 @@ namespace rtx {
     deltaPos = motionDelta.getPosition();
 
     deltaDistance = deltaPos.getMagnitude();       // Get motion distance
-    deltaOrient   = motionDelta.getOrientation() * 180.0 / M_PI;  // Get orientation error
+    deltaOrient   = motionDelta.getOrientation(); // motionDelta.getOrientation() * 180.0 / M_PI;  // Get orientation error
 
     velocityControl.SV = deltaDistance; // Set distance target
     orientControl.SV   = deltaOrient; // Set orientation target
@@ -124,7 +128,6 @@ namespace rtx {
 
     // sim_tick(robotControlState);
 
-    //printf("[rtx::motion_handler]input: {.deltaPos = (%i, %i), .deltaDistance = %.2f, .deltaOrient = %.2f}\n", deltaPos.x, deltaPos.y, deltaDistance, deltaOrient);
 
     // printf("[rtx::motion_handler]t=%lu, SV/deltaDistance=%.2f, PV=%.2f, PID/gVelocity=%.2f\n",
     //  velocityControl._t, velocityControl.SV, velocityControl._lastProcessValue, velocityControl.out);
@@ -133,8 +136,15 @@ namespace rtx {
     //    orientControl._t, orientControl.SV, orientControl._lastProcessValue, orientControl.out);
 
 
-    //printf("[rtx::motion_handler]#TODO omniDrive(%i, %.2f, %i)\n",
-    //  velocity, motionDirection, angularVelocity);
+    if(debug_clk.tick())
+    {
+      uint8_t vel = robotControlState->velocity, avel = robotControlState->angularVelocity;
+      float head = robotControlState->heading;
+
+      printf("[rtx::motion_handler]input: {.deltaPos = (%.1f, %.1f), .deltaDistance = %.2f, .deltaOrient = %.2f}\n", deltaPos.x, deltaPos.y, deltaDistance, deltaOrient);
+      printf("[rtx::motion_handler]#TODO omniDrive(%i, %.2f, %i)\n", vel, head, avel);
+    }
+
     tuum::hal::hw.getMotionControl()->omniDrive(robotControlState->velocity, robotControlState->heading, robotControlState->angularVelocity);
 
     return 0;

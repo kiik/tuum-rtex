@@ -213,8 +213,8 @@ namespace rtx {
           {
             const int L = 50;
 
-            const float A = M_PI;
-            mvec = cv::Point(cos(o) * L, sin(o) * L);
+            const float A = -1 * M_PI / 2.0;
+            mvec = cv::Point(cos(o + A) * L, sin(o + A) * L);
 
             cv::line(iFrame, tPos, tPos + mvec, cRed, 1.0);
             cv::putText(iFrame, "O", tPos + mvec, FONT_HERSHEY_SIMPLEX, 0.4, cWhite, 1.4);
@@ -232,7 +232,7 @@ namespace rtx {
           cv::Point aPos_world(gNavCtx.aPos.x, gNavCtx.aPos.y);
           cv::Point aPos(W_2 - aPos_world.y, H - aPos_world.x);
 
-          printf("(1)aPos World(%i, %i)/Frame(%i, %i)\n", aPos_world.x, aPos_world.y, aPos.x, aPos.y);
+          // printf("(1)aPos World(%i, %i)/Frame(%i, %i)\n", aPos_world.x, aPos_world.y, aPos.x, aPos.y);
 
           cv::line(iFrame, P0, aPos, deepPink, 2.5);
           cv::putText(iFrame, "A", aPos, FONT_HERSHEY_SIMPLEX, 0.4, cWhite, 1.4);
