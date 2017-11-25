@@ -203,7 +203,8 @@ namespace rtx {
     Basketball::setup();
   }
 
-  void process() {
+  void process()
+  {
     gSys.process();
 
     hal::hw.readFrame(frameBackBuffer);

@@ -327,7 +327,12 @@ namespace rtx {
   {
     Transform out;
 
-    Vec2i p0 = bl->getTransform()->getPosition(), p1;
+    Vec2i p0, p1;
+
+    p0 = bl->getTransform()->getPosition();
+
+    if(gl)
+      p1 = gl->getTransform()->getPosition();
 
     Vec2i pvec;
     Vec2D<double> avec;

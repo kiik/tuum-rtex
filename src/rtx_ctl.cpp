@@ -256,7 +256,13 @@ namespace rtx {
       else apos = bl->getTransform()->getPosition();
 
       gNav->navTo(t.getPosition());
-      gNav->aim(apos);
+
+      if(gl)
+      {
+        apos = gl->getTransform()->getPosition();
+        gNav->aim(apos);
+      }
+      else apos = bl->getTransform()->getPosition();
 
       if(!gNav->isTargetAchieved()) {
         //Deprecated: if(!gNav->isRunning()) gNav->start();
