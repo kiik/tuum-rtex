@@ -198,7 +198,7 @@ namespace rtx {
 
     hal::hw.readFrame(frameBackBuffer);
     // frameBackBuffer = misc::resize2(frameBackBuffer, 1280);
-    frameBackBuffer.copyTo(frameBuffer);
+    // frameBackBuffer.copyTo(frameBuffer);
 
     rtx::marker_detection(frameBackBuffer, gGameField);
     rtx::object_detection(frameBackBuffer, gGameField);
@@ -207,7 +207,7 @@ namespace rtx {
 
     Basketball::process();
 
-    cmv_render_ui(frameBuffer);
+    // cmv_render_ui(frameBuffer);
   }
 
 }

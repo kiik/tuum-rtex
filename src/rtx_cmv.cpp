@@ -97,10 +97,6 @@ namespace rtx {
         cmv_ui_colorpick(x, y);
         break;
       }
-      case CV_EVENT_MOUSEWHEEL:
-      case CV_EVENT_MOUSEHWHEEL:
-        printf("WHEL %i\n", cv::getMouseWheelDelta(flags));
-        break;
     }
   }
 
