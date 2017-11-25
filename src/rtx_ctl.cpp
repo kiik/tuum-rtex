@@ -261,8 +261,7 @@ namespace rtx {
       {
         apos = gl->getTransform()->getPosition();
         gNav->aim(apos);
-      }
-      else apos = bl->getTransform()->getPosition();
+      } else apos = bl->getTransform()->getPosition();
 
       if(!gNav->isTargetAchieved()) {
         //Deprecated: if(!gNav->isRunning()) gNav->start();
@@ -275,7 +274,12 @@ namespace rtx {
       }
 
     } else {
-      if(gNav != nullptr) gNav->stop();
+      if(gNav != nullptr)
+      {
+        gNav->navTo();
+        gNav->aim();
+        gNav->stop();
+      }
     }
 
     return 0;

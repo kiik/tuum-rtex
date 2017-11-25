@@ -173,6 +173,8 @@ namespace rtx {
     if(gDebug.axis_dbg_flag)
       cmv_ui_draw_axis(iFrame);
 
+    std::string label;
+
     if(gDebug.nav_dbg_flag)
     {
       {
@@ -260,16 +262,24 @@ namespace rtx {
             cv::Vec2i pos = cv::Vec2i(_pos.x, _pos.y);
             auto rect = bl->getBlob()->getRect();
 
-            const std::string label = bl->toString(); // tuum::format("B#%lu(%i,%i)", bl->getId(), pos[0], pos[1]);
+            label = bl->toString(); // tuum::format("B#%lu(%i,%i)", bl->getId(), pos[0], pos[1]);
 
-            cv::line(iFrame, P0, pos, lightGray, 1.0);
-
-            cv::putText(iFrame, label, pos,FONT_HERSHEY_SIMPLEX, 0.35, Scalar(0,0,0,255),2.0);
-            cv::putText(iFrame, label, pos,FONT_HERSHEY_SIMPLEX, 0.35, Scalar(255,255,255,255),1.7);
-
-            if(gDebug.rect_en_flag)
+            if(bl->isAlive())
             {
-              cv::rectangle(iFrame, cv::Point(rect.x0, rect.y0), cv::Point(rect.x1, rect.y1), neonGreen);
+              cv::line(iFrame, P0, pos, lightGray, 1.0);
+
+              cv::putText(iFrame, label, pos,FONT_HERSHEY_SIMPLEX, 0.35, Scalar(0,0,0,255),2.0);
+              cv::putText(iFrame, label, pos,FONT_HERSHEY_SIMPLEX, 0.35, Scalar(255,255,255,255),1.7);
+
+              if(gDebug.rect_en_flag)
+              {
+                cv::rectangle(iFrame, cv::Point(rect.x0, rect.y0), cv::Point(rect.x1, rect.y1), neonGreen);
+              }
+            }
+            else
+            {
+              label = tuum::format("B#%lu;%i", bl->getId(), bl->aliveFrameCount());
+              cv::putText(iFrame, label, pos, FONT_HERSHEY_SIMPLEX, 0.3, Scalar(50,50,50,255),1.0);
             }
           }
         }
@@ -289,17 +299,27 @@ namespace rtx {
             cv::Vec2i pos = cv::Vec2i(_pos.x, gl->getBlob()->getRect().y1);
             auto rect = gl->getBlob()->getRect();
 
-            const std::string label = gl->toString(); // tuum::format("G#%lu(%i,%i)", gl->getId(), pos[0], pos[1]);
+            label = gl->toString(); // tuum::format("G#%lu(%i,%i)", gl->getId(), pos[0], pos[1]);
 
-            cv::line(iFrame, P0, pos, skyBlue, 1.0);
-
-            cv::putText(iFrame, label, pos,FONT_HERSHEY_SIMPLEX, 0.35, Scalar(0,0,0,255),2.0);
-            cv::putText(iFrame, label, pos,FONT_HERSHEY_SIMPLEX, 0.35, Scalar(255,255,255,255),1.7);
-
-            if(gDebug.rect_en_flag)
+            if(gl->isAlive())
             {
-              cv::rectangle(iFrame, cv::Point(rect.x0, rect.y0), cv::Point(rect.x1, rect.y1), skyBlue);
+              cv::line(iFrame, P0, pos, skyBlue, 1.0);
+
+              cv::putText(iFrame, label, pos,FONT_HERSHEY_SIMPLEX, 0.35, Scalar(0,0,0,255),2.0);
+              cv::putText(iFrame, label, pos,FONT_HERSHEY_SIMPLEX, 0.35, Scalar(255,255,255,255),1.7);
+
+              if(gDebug.rect_en_flag)
+              {
+                cv::rectangle(iFrame, cv::Point(rect.x0, rect.y0), cv::Point(rect.x1, rect.y1), skyBlue);
+              }
             }
+            else
+            {
+              label = tuum::format("G#%lu;%i", gl->getId(), gl->aliveFrameCount());
+              cv::putText(iFrame, label, pos,FONT_HERSHEY_SIMPLEX, 0.3, Scalar(50,50,50,255),1.0);
+            }
+
+
           }
         }
       }

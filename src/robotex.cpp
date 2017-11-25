@@ -71,7 +71,7 @@ namespace rtx {
     libPID.set_period_ms(1000 / 50, &velocityControl);
 
     libPID.init(&orientControl);
-    libPID.set_tuning(1.0 / 400.0, 0.0, 0.0, &orientControl);
+    libPID.set_tuning(1.0, 0.0, 0.0, &orientControl);
     libPID.set_limit(-45, 45, &orientControl);
     libPID.set_period_ms(1000 / 50, &orientControl);
 
@@ -110,7 +110,7 @@ namespace rtx {
     deltaPos = motionDelta.getPosition();
 
     deltaDistance = deltaPos.getMagnitude();       // Get motion distance
-    deltaOrient   = motionDelta.getOrientation(); // motionDelta.getOrientation() * 180.0 / M_PI;  // Get orientation error
+    deltaOrient   = motionDelta.getPosition().y / 400.0 * 50; // motionDelta.getOrientation() * 180.0 / M_PI;  // Get orientation error
 
     velocityControl.SV = deltaDistance; // Set distance target
     orientControl.SV   = deltaOrient; // Set orientation target
@@ -132,7 +132,7 @@ namespace rtx {
     // printf("[rtx::motion_handler]t=%lu, SV/deltaDistance=%.2f, PV=%.2f, PID/gVelocity=%.2f\n",
     //  velocityControl._t, velocityControl.SV, velocityControl._lastProcessValue, velocityControl.out);
 
-    //printf("[rtx::motion_handler]t=%lu, SV/deltaOrient=%.2f, PV=%.2f, PID/gTurnVelocity=%.2f\n",
+    // printf("[rtx::motion_handler]t=%lu, SV/deltaOrient=%.2f, PV=%.2f, PID/gTurnVelocity=%.2f\n",
     //    orientControl._t, orientControl.SV, orientControl._lastProcessValue, orientControl.out);
 
 
@@ -141,7 +141,7 @@ namespace rtx {
       uint8_t vel = robotControlState->velocity, avel = robotControlState->angularVelocity;
       float head = robotControlState->heading;
 
-      printf("[rtx::motion_handler]input: {.deltaPos = (%.1f, %.1f), .deltaDistance = %.2f, .deltaOrient = %.2f}\n", deltaPos.x, deltaPos.y, deltaDistance, deltaOrient);
+      printf("[rtx::motion_handler]input: {.deltaPos = (%.1f, %.1f), .deltaDistance = %.2frad, .deltaOrient = %.2fdeg}\n", deltaPos.x, deltaPos.y, deltaDistance, deltaOrient);
       printf("[rtx::motion_handler]#TODO omniDrive(%i, %.2f, %i)\n", vel, head, avel);
     }
 

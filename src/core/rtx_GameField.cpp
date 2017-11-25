@@ -278,6 +278,8 @@ namespace rtx {
 
     for(auto &bl : mBalls)
     {
+      if(!bl->isAlive()) continue;
+
       if(ptr == nullptr)
       {
         ptr = bl;
@@ -306,6 +308,7 @@ namespace rtx {
     //if(mGoalConfidence < 0.5) return nullptr;
     for(auto &gl : mGoals)
     {
+      if(!gl->isAlive()) continue;
       return gl;
     }
 
