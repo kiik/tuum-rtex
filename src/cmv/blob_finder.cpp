@@ -155,6 +155,7 @@ namespace cmv {
 
     // Get all the blobs
     blob_count_ = 0;
+    std::vector<cmv::blob_t> blob_vec;
     cmv::blob_t blob_buf;
     for (int ch = 0; ch < CMV_MAX_COLORS; ++ch)
     {
@@ -188,10 +189,14 @@ namespace cmv {
         blob_buf.top = r->y1;
         blob_buf.bottom = r->y2;
 
-        blob_cb(&blob_buf);
-
         blob_count_++;
+        blob_vec.push_back(blob_buf);
       }
+    }
+
+    for(auto & bl : blob_vec)
+    {
+      blob_cb(&bl);
     }
 
     passData.blobCount = blob_count_;

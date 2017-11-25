@@ -66,7 +66,7 @@ namespace rtx {
     debug_clk.init(500);
 
     libPID.init(&velocityControl);
-    libPID.set_tuning(0.8, 0.5, 0.06, &velocityControl);
+    libPID.set_tuning(1.0, 0.0, 0.0, &velocityControl);
     libPID.set_limit(-40, 40, &velocityControl);
     libPID.set_period_ms(1000 / 50, &velocityControl);
 

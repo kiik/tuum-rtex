@@ -64,6 +64,8 @@ namespace rtx {
 
   void GameField::digestBallBlob(cmv::blob_t& bl)
   {
+    if(bl.area < 100) return;
+
     //TODO: Apply undistortion, T_cameraToWorld
     Transform tfm;
     Blob blob(bl.name, {
@@ -104,9 +106,10 @@ namespace rtx {
 
   void GameField::digestGoalBlob(cmv::blob_t& bl)
   {
-    Transform tfm;
+    if(bl.area < 100) return;
 
     //TODO: Apply T_undistort, T_cameraToWorld
+    Transform tfm;
     Blob blob(bl.name, {
       .rect = {bl.left, bl.top, bl.right, bl.bottom},
       .realArea = bl.area

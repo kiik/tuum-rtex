@@ -64,7 +64,7 @@ namespace rtx {
 
   bool cmv_ui_init = false;
 
-  const int robotPlaneOffset = 100, axisPadding = 20, unitStep = 100, unitBarSize_2 = 10;
+  const int robotPlaneOffset = 0, axisPadding = 20, unitStep = 100, unitBarSize_2 = 10;
 
   cv::Mat oFrame;
 
@@ -204,18 +204,19 @@ namespace rtx {
             o = gNavCtx.tOri;
           }
           else if(gNavCtx.hasAim()) {
-            cv::Point aPos_world(gNavCtx.aPos.x, gNavCtx.aPos.y);
-            cv::Point aPos(W_2 - aPos_world.y, H - aPos_world.x);
+            aPos_world = cv::Point(gNavCtx.aPos.x, gNavCtx.aPos.y);
+            aPos = cv::Point(W_2 - aPos_world.y, H - aPos_world.x);
 
-            cv::Point dv = (aPos - tPos);
-            o = atan2(dv.y, dv.x);
+            // cv::Point dv = (aPos - tPos);
+            //o = atan2(dv.y, dv.x);
+            o = aPos.y / 400.0 * 50;
           }
 
           if(o != 0.0)
           {
             const int L = 50;
 
-            const float A = -1 * M_PI / 2.0;
+            const float A = 0;
             mvec = cv::Point(cos(o + A) * L, sin(o + A) * L);
 
             cv::line(iFrame, tPos, tPos + mvec, cRed, 1.0);
@@ -391,6 +392,7 @@ namespace rtx {
           for(int i = 0; i < 3; ++i)
           {
             printf("%i:%i ", gThr.low[i], gThr.high[i]);
+            if(i < 2) printf(",");
           }
           printf(")\n");
         }
