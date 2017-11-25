@@ -331,8 +331,9 @@ namespace rtx {
 
   Transform GameField::ballPickupPos(BallHandle bl, GoalHandle gl)
   {
-    Transform out;
+    const unsigned int PICKUP_DISTANCE = 100;
 
+    Transform out;
     Vec2i p0, p1;
 
     p0 = bl->getTransform()->getPosition();

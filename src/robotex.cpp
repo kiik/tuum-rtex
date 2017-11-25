@@ -109,7 +109,8 @@ namespace rtx {
   {
     deltaPos = motionDelta.getPosition();
 
-    deltaDistance = deltaPos.getMagnitude();       // Get motion distance
+    deltaDistance = deltaPos.getMagnitude() / 10.0;       // Get motion distance
+
     deltaOrient   = motionDelta.getPosition().y / 400.0 * 50; // motionDelta.getOrientation() * 180.0 / M_PI;  // Get orientation error
 
     velocityControl.SV = deltaDistance; // Set distance target
@@ -138,7 +139,7 @@ namespace rtx {
 
     if(debug_clk.tick())
     {
-      uint8_t vel = robotControlState->velocity, avel = robotControlState->angularVelocity;
+      int16_t vel = robotControlState->velocity, avel = robotControlState->angularVelocity;
       float head = robotControlState->heading;
 
       printf("[rtx::motion_handler]input: {.deltaPos = (%.1f, %.1f), .deltaDistance = %.2frad, .deltaOrient = %.2fdeg}\n", deltaPos.x, deltaPos.y, deltaDistance, deltaOrient);
