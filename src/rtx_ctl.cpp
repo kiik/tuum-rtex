@@ -248,19 +248,26 @@ namespace rtx {
     bl = gGameField->getNearestBall();
     gl = gGameField->getOpponentGoal();
 
-    if(bl != nullptr) {
+    if(bl != nullptr)
+    {
+      // Calculate target position and orientation error
       Transform t = gGameField->ballPickupPos(bl, gl);
       Vec2i apos;
 
       if(gl) apos = gl->getTransform()->getPosition();
       else apos = bl->getTransform()->getPosition();
 
-      gNav->navTo(t.getPosition());
+      if(t.getPosition().getMagnitude() < 15)
+      {
+        return 1;
+      }
+
+      gNav->navTo(t.getPosition(), t.getOrientation());
 
       if(gl)
       {
         apos = gl->getTransform()->getPosition();
-        gNav->aim(apos);
+        //gNav->aim(apos);
       } else apos = bl->getTransform()->getPosition();
 
       if(!gNav->isTargetAchieved()) {

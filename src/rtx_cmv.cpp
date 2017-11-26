@@ -187,13 +187,15 @@ namespace rtx {
 
         if(gNavCtx.hasTarget())
         {
-          cv::Point tPos_world(gNavCtx.tPos.x, gNavCtx.tPos.y);
-          cv::Point tPos(W_2 - tPos_world.y, H - tPos_world.x);
+          cv::Point tPos_robot(gNavCtx.tPos.x, gNavCtx.tPos.y);
+          cv::Point aPos_robot, aPos;
 
-          cv::Point aPos_world, aPos;
+          // Robot to Frame transform
+          cv::Point tPos(W_2 - tPos_robot.y, H - tPos_robot.x);
 
           cv::Point mvec, oPos;
 
+          // Draw target vector
           cv::line(iFrame, P0, tPos, goldenRod, 2.5);
           cv::putText(iFrame, "T", tPos, FONT_HERSHEY_SIMPLEX, 0.4, cWhite, 1.4);
 
@@ -202,18 +204,7 @@ namespace rtx {
           // Get orientation target
           if(gNavCtx.hasOrient()) {
             o = gNavCtx.tOri;
-          }
-          else if(gNavCtx.hasAim()) {
-            aPos_world = cv::Point(gNavCtx.aPos.x, gNavCtx.aPos.y);
-            aPos = cv::Point(W_2 - aPos_world.y, H - aPos_world.x);
 
-            // cv::Point dv = (aPos - tPos);
-            //o = atan2(dv.y, dv.x);
-            o = aPos.y / 400.0 * 50;
-          }
-
-          if(o != 0.0)
-          {
             const int L = 50;
 
             const float A = 0;
@@ -226,16 +217,28 @@ namespace rtx {
             cv::line(iFrame, tPos, tPos + mvec, cGreen, 1.0);
           }
 
-          // printf("(0)tPos World(%i, %i)/Frame(%i, %i)\n", tPos_world.x, tPos_world.y, tPos.x, tPos.y);
-          // printf("(0)aPos World(%i, %i)/Frame(%i, %i)\n", aPos_world.x, aPos_world.y, aPos.x, aPos.y);
+          /*
+          if(gNavCtx.hasAim()) {
+            aPos_robot = cv::Point(gNavCtx.aPos.x, gNavCtx.aPos.y);
+            aPos = cv::Point(W_2 - aPos_robot.y, H - aPos_robot.x);
+
+            // cv::Point dv = (aPos - tPos);
+            //o = atan2(dv.y, dv.x);
+            o = aPos.y / 400.0 * 50;
+          }*/
+
+          // printf("(0)tPos World(%i, %i)/Frame(%i, %i)\n", tPos_robot.x, tPos_robot.y, tPos.x, tPos.y);
+          // printf("(0)aPos World(%i, %i)/Frame(%i, %i)\n", aPos_robot.x, aPos_robot.y, aPos.x, aPos.y);
         }
 
         if(gNavCtx.hasAim())
         {
-          cv::Point aPos_world(gNavCtx.aPos.x, gNavCtx.aPos.y);
-          cv::Point aPos(W_2 - aPos_world.y, H - aPos_world.x);
+          cv::Point aPos_robot(gNavCtx.aPos.x, gNavCtx.aPos.y);
 
-          // printf("(1)aPos World(%i, %i)/Frame(%i, %i)\n", aPos_world.x, aPos_world.y, aPos.x, aPos.y);
+          // Robot to Frame transform
+          cv::Point aPos(W_2 - aPos_robot.y, H - aPos_robot.x);
+
+          printf("(1)aPos World(%i, %i)/Frame(%i, %i)\n", aPos_robot.x, aPos_robot.y, aPos.x, aPos.y);
 
           cv::line(iFrame, P0, aPos, deepPink, 2.5);
           cv::putText(iFrame, "A", aPos, FONT_HERSHEY_SIMPLEX, 0.4, cWhite, 1.4);

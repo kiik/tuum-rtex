@@ -329,29 +329,33 @@ namespace rtx {
     return out;
   }
 
+  // If goal not visible: Drive to nearest ball and move around it (tP = ballpos, tO = T(ballpos.y) )
+  // If goal visible:
+  //  -- Drive to nearest ball ( tP = ballpos )
+  //  -- Aim at Goal-Ball vector center ( tO = T((ballPos + (goalPos - ballPos) * 0.5).y) )
   Transform GameField::ballPickupPos(BallHandle bl, GoalHandle gl)
   {
     const unsigned int PICKUP_DISTANCE = 100;
 
     Transform out;
-    Vec2i p0, p1;
+    Vec2i ballPos, goalPos;
 
-    p0 = bl->getTransform()->getPosition();
+    ballPos = bl->getTransform()->getPosition();
+    out.setPosition(ballPos);
 
     if(gl)
-      p1 = gl->getTransform()->getPosition();
+      goalPos = gl->getTransform()->getPosition();
 
     Vec2i pvec;
-    Vec2D<double> avec;
+    Vec2D<double> ballGoalVec;
 
-    if(gl) p1 = gl->getTransform()->getPosition();
-    else p1 = bl->getTransform()->getPosition() * 2.0;
+    if(gl) goalPos = gl->getTransform()->getPosition();
+    else goalPos = bl->getTransform()->getPosition() * 2.0;
 
-    avec = (p1 - p0).getNormalized();
-    pvec = p0 - avec * 55;
+    ballGoalVec = (goalPos - ballPos).getNormalized();
+    ballGoalVec = ballPos - ballGoalVec * PICKUP_DISTANCE;
 
-    out.setPosition(pvec);
-    out.setOrientation(avec.getOrientation());
+    out.setOrientation(ballGoalVec.y / 400.0 * 50 * 3.14 / 180.0);
 
     return out;
   }
