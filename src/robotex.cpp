@@ -66,12 +66,12 @@ namespace rtx {
     debug_clk.init(500);
 
     libPID.init(&velocityControl);
-    libPID.set_tuning(1.0, 0.0, 0.0, &velocityControl);
+    libPID.set_tuning(1.0, 0.1, 0.0, &velocityControl);
     libPID.set_limit(-40, 40, &velocityControl);
     libPID.set_period_ms(1000 / 50, &velocityControl);
 
     libPID.init(&orientControl);
-    libPID.set_tuning(0.4, 0.4, 0.1, &orientControl);
+    libPID.set_tuning(1.0, 0.2, 0.05, &orientControl);
     libPID.set_limit(-45, 45, &orientControl);
     libPID.set_period_ms(1000 / 50, &orientControl);
 
@@ -110,10 +110,9 @@ namespace rtx {
     deltaPos = motionDelta.getPosition();
 
     deltaDistance = deltaPos.x / 10.0;       // Get motion distance
-    deltaOrient   = motionDelta.getOrientation(); // motionDelta.getOrientation() * 180.0 / M_PI;  // Get orientation error
+    deltaOrient   = motionDelta.getOrientation() * 180 / M_PI; // motionDelta.getOrientation() * 180.0 / M_PI;  // Get orientation error
 
-    if(abs(deltaDistance) < 10.0) deltaDistance = 0.0;
-    if(abs(deltaOrient) < 3.0) deltaOrient = 0.0;
+    // if(abs(deltaOrient) < 3.0 * 3.14 / 180.0) deltaOrient = 0.0;
 
     velocityControl.SV = deltaDistance; // Set distance target
     orientControl.SV   = deltaOrient; // Set orientation target
@@ -124,29 +123,37 @@ namespace rtx {
 
     // Retrieve calculated velocities
     // robotControlState->motionVector = deltaPos.getNormalized();
-    robotControlState->heading = deltaPos.y / 400.0 / 50 * 3.14 / 180.0;
+    float _h = deltaPos.y / 400.0 * 50 * 3.14 / 180.0;
+    robotControlState->heading = _h;
 
     robotControlState->velocity = velocityControl.out;
     robotControlState->angularVelocity = -1 * orientControl.out;
 
     // sim_tick(robotControlState);
 
-    if(deltaDistance == 0.0) robotControlState->velocity = 0;
-    if(deltaOrient == 0.0) robotControlState->angularVelocity = 0;
+    // if(deltaDistance == 0.0) robotControlState->velocity = 0;
+    // if(deltaOrient == 0.0) robotControlState->angularVelocity = 0;
+    //
+    //
 
-    // printf("[rtx::motion_handler]t=%lu, SV/deltaDistance=%.2f, PV=%.2f, PID/gVelocity=%.2f\n",
-    //  velocityControl._t, velocityControl.SV, velocityControl._lastProcessValue, velocityControl.out);
+    if(robotControlState->velocity <= 5)
+      if(abs(deltaDistance) < 5.0 && robotControlState->heading > 0.1) robotControlState->velocity = 5;
 
-    // printf("[rtx::motion_handler]t=%lu, SV/deltaOrient=%.2f, PV=%.2f, PID/gTurnVelocity=%.2f\n",
-    //    orientControl._t, orientControl.SV, orientControl._lastProcessValue, orientControl.out);
+    if(robotControlState->velocity < 0) robotControlState->heading *= -1;
 
     if(debug_clk.tick())
     {
       int16_t vel = robotControlState->velocity, avel = robotControlState->angularVelocity;
       float head = robotControlState->heading;
 
+      printf("[rtx::motion_handler]t=%lu, SV/deltaDistance=%.2f, PV=%.2f, PID/gVelocity=%.2f\n",
+        velocityControl._t, velocityControl.SV, velocityControl._lastProcessValue, velocityControl.out);
+
+      printf("[rtx::motion_handler]t=%lu, SV/deltaOrient=%.2f, PV=%.2f, PID/gTurnVelocity=%.2f\n",
+         orientControl._t, orientControl.SV, orientControl._lastProcessValue, orientControl.out);
+
       printf("[rtx::motion_handler]input: {.deltaPos = (%.1f, %.1f), .deltaDistance = %.2frad, .deltaOrient = %.2fdeg}\n", deltaPos.x, deltaPos.y, deltaDistance, deltaOrient);
-      printf("[rtx::motion_handler]#TODO omniDrive(%i, %.2f, %i)\n", vel, head, avel);
+      printf("[rtx::motion_handler]omniDrive(%i, %.2f, %i)\n", vel, head, avel);
     }
 
     tuum::hal::hw.getMotionControl()->omniDrive(robotControlState->velocity, robotControlState->heading, robotControlState->angularVelocity);

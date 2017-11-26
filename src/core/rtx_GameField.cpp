@@ -87,7 +87,7 @@ namespace rtx {
     const int W_2 = 1280 / 2, H = 800;
 
     //TODO: Apply camera to world transformation
-    tfm.setPosition({H - bl.c_y, W_2 - bl.c_x});
+    tfm.setPosition({H - bl.c_y, (-bl.c_x + W_2)});
     Vec2i pos = tfm.getPosition();
 
     for(auto &ball : mBalls)
@@ -124,7 +124,7 @@ namespace rtx {
     const int W_2 = 1280 / 2, H = 800;
 
     //TODO: Apply camera to world transformation
-    tfm.setPosition({H - bl.c_y, W_2 - bl.bottom});
+    tfm.setPosition({H - bl.c_y, -1 * bl.c_x + W_2});
 
     const float matchCondition = 0.5;
 
@@ -358,17 +358,26 @@ namespace rtx {
 
       out.setPosition(ballPos - pv * PICKUP_DISTANCE);
       out.setOrientation(ballPos.y * T_yToRad);
+
+      Vec2i p = out.getPosition();
+      float o = out.getOrientation();
+      // printf("TO BALL %s -> (%i, %i)/%.2f\n", bl->toString().c_str(), p.x, p.y, o);
     }
     else
     {
       // Drive to ball and keep eye on goal
       goalPos = gl->getTransform()->getPosition();
 
-      Vec2f pv = ballPos.getNormalized();
+      Vec2f pv = (goalPos - ballPos).getNormalized();
       float c_y = ballPos.y + 0.5 * (goalPos.y - ballPos.y);
 
       out.setPosition(ballPos - pv * PICKUP_DISTANCE);
       out.setOrientation(c_y * T_yToRad);
+
+      Vec2i p = out.getPosition();
+      float o = out.getOrientation();
+      // printf("pv=(%.2f, %.2f), c_y = %.2f\n", pv.x, pv.y, c_y);
+      // printf("TO BALL+GOAL %s/%s -> (%i, %i)/%.2f\n", bl->toString().c_str(), gl->toString().c_str(), p.x, p.y, o);
     }
 
     return out;
