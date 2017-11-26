@@ -235,6 +235,11 @@ namespace rtx {
     m_dbg_clk.init(1000);
   }
 
+
+  bool ball_pick_active = false;
+  int ball_pick_n = 0;
+
+
   int LSBallNavigator::run()
   {
     tuum::Navigator *gNav = (tuum::Navigator*)gSystem->findSubsystem(Navigator::GetType());
@@ -257,10 +262,19 @@ namespace rtx {
       // if(gl) apos = gl->getTransform()->getPosition();
       // else apos = bl->getTransform()->getPosition();
 
-      if(t.getPosition().getMagnitude() < 15)
+      printf("dbg: %i, %.2f\n", t.getPosition().x, t.getOrientation());
+      int dx = t.getPosition().x;
+      float da = t.getOrientation();
+
+      if(dx < 3 && da < 0.03)
       {
+	printf("nav fin %i\n", gGameField->countValidBalls());
+	hal::hw.getMotionControl()->omniDrive(0, 0, 0);
+	gNav->stop();
+	ball_pick_active = true;
         return 1;
       }
+
       gNav->navTo(t.getPosition(), t.getOrientation());
 
       /*
@@ -306,14 +320,20 @@ ERR:
     return gGameField->countValidBalls() > 0;
   }
 
-
   // Ball pickup
   void LSBallPicker::init() {
     tuum::Navigator *gNav = (tuum::Navigator*)gSystem->findSubsystem(Navigator::GetType());
     if(gNav != nullptr) gNav->stop();
 
-    mb->pickupState();
+    //mb->pickupState();
+    hal::hw.pitcherSet(45, 0);
+
+    m_dbg_clk.init(250);
+
+    ball_pick_active = true;
+    ball_pick_n = 0;
   }
+
 
   int LSBallPicker::run() {
     tuum::Navigator *gNav = (tuum::Navigator*)gSystem->findSubsystem(Navigator::GetType());
@@ -321,56 +341,48 @@ ERR:
     BallHandle b = nullptr;
 
     // if(mb->getBallSensorState()) goto OK;
-    if(gGameField->countValidBalls() <= 0) goto ERR;
-
+    // if(gGameField->countValidBalls() <= 0) goto ERR;
     b = gGameField->getNearestBall();
 
-    if(b != nullptr)
+    if(m_dbg_clk.tick())
     {
-      const double dD = Motion::DribblerPlanePadding;
-
-      Transform* t = b->getTransform();
-      Transform* me = Localization::getTransform();
-
-      Vec2f avf = (t->getPosition() - me->getPosition()).getNormalized();
-
-      if(gNav != nullptr) gNav->stop();
-
-      if(m_dbg_clk.tick())
-      {
-        printf("[LSBallPicker]#TODO: Set throw distance\n");
-      }
-
-      //gNav->navTo(t->getPosition() + (Vec2i)(avf*dD));
-      //gNav->aim(t->getPosition() + (Vec2i)(avf*1.1*dD));
-
-      // if(me->getPosition().distanceTo(t->getPosition()) > dD) return -1;
-
-      //if(!mb->getDribblerState()) mb->startDribbler(0.4);
-      // if(!gNav->isRunning()) gNav->start();
-    } else {
-      if(gNav != nullptr) gNav->stop();
+      ball_pick_n++;
+      //printf("[LSBallPicker]#TODO: Set throw distance\n");
+    
+      hal::hw.getMotionControl()->omniDrive(60, -0.30, 20);
     }
 
+    //gNav->navTo(Vec2i(100, 0));
+    if(ball_pick_n >= 4)
+    {
+      ball_pick_active = false;
+      printf("deactivate\n");
+    }
     return 0;
 OK:
-    if(gNav != nullptr) gNav->stop();
+    //if(gNav != nullptr) gNav->stop();
     return 1;
 ERR:
-    if(gNav != nullptr) gNav->stop();
+    // if(gNav != nullptr) gNav->stop();
     //mb->stopDribbler();
     return -1;
   }
 
   bool LSBallPicker::isRunnable() {
-    if(mb->getBallSensorState()) return true;
+    // if(mb->getBallSensorState()) return true;
+    if(!ball_pick_active) return false;
 
-    BallHandle b = gGameField->getNearestBall();
-    if(b == nullptr) return false;
+    //BallHandle b = gGameField->getNearestBall();
+    //if(b == nullptr) return false;
 
+    // Transform tfm = gGameField->ballPickupPos(b, nullptr);
+    // if(tfm.getPosition().x > 5) return false;
+
+    /*
     Transform* t = Localization::getTransform();
     double d = t->distanceTo(b->getTransform()->getPosition());
     if(d > Motion::MinDist) return false;
+    */
 
     return true;
   }
