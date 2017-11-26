@@ -247,7 +247,7 @@ namespace rtx {
     int dx;
     float da;
 
-    Transform t;
+    Transform t(0, 0, 0.0);
 
     tuum::Navigator *gNav = (tuum::Navigator*)gSystem->findSubsystem(Navigator::GetType());
     if(gNav == nullptr)
@@ -272,7 +272,7 @@ namespace rtx {
       return 0;
     }
 
-    // Calculate target position and orientation error
+    // Calculate target position and orientation error (handles goal nullptr)
     t = gGameField->ballPickupPos(bl, gl);
 
     dx = t.getPosition().x;
@@ -280,17 +280,18 @@ namespace rtx {
 
     if(gl == nullptr)
     {
-      // Merrygoround
-      gl->getTransform()->getPosition();
-
       if(dx < 10)
       {
         //TODO: Strafe
 
         // Move position along Y axis
         printf("STRAFE\n");
-        t.setPosition(t.getPosition() + Vec2i(0,  10));
-        t.setOrientation(t.getOrientation() + 10 * degToRad);
+
+        Vec2i pv = t.getPosition() + Vec2i(0,  10);
+        float o = t.getOrientation() + 10 * degToRad;
+
+        t.setPosition(pv);
+        t.setOrientation(o);
       }
 
       gNav->navTo(t.getPosition(), t.getOrientation());
