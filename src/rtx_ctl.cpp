@@ -252,29 +252,32 @@ namespace rtx {
     {
       // Calculate target position and orientation error
       Transform t = gGameField->ballPickupPos(bl, gl);
-      Vec2i apos;
+      // Vec2i apos;
 
-      if(gl) apos = gl->getTransform()->getPosition();
-      else apos = bl->getTransform()->getPosition();
+      // if(gl) apos = gl->getTransform()->getPosition();
+      // else apos = bl->getTransform()->getPosition();
 
       if(t.getPosition().getMagnitude() < 15)
       {
         return 1;
       }
-
       gNav->navTo(t.getPosition(), t.getOrientation());
 
+      /*
       if(gl)
       {
         apos = gl->getTransform()->getPosition();
         //gNav->aim(apos);
       } else apos = bl->getTransform()->getPosition();
+      */
 
       if(!gNav->isTargetAchieved()) {
         //Deprecated: if(!gNav->isRunning()) gNav->start();
         if(m_dbg_clk.tick())
         {
-          printf("[LSBallNavigator]Navigate to %s. Aim at (%i, %i)\n", bl->toString().c_str(), apos.x, apos.y);
+          Entity *ptr = bl;
+	  if(gl != nullptr) ptr = gl;
+          printf("[LSBallNavigator]Navigate to %s. Aim at %s\n", bl->toString().c_str(), ptr->toString().c_str());
         }
       } else {
         goto OK;
