@@ -73,6 +73,9 @@ namespace rtx {
       .realArea = bl.area
     });
 
+    blob.c_x = bl.c_x;
+    blob.c_y = bl.c_y;
+
     // mCamMx, mDistCoeff
 
     std::vector<cv::Point2d> vIn = {cv::Point2d(bl.c_x, bl.c_y)};
@@ -114,6 +117,9 @@ namespace rtx {
       .rect = {bl.left, bl.top, bl.right, bl.bottom},
       .realArea = bl.area
     });
+
+    blob.c_x = bl.c_x;
+    blob.c_y = bl.c_y;
 
     const int W_2 = 1280 / 2, H = 800;
 
