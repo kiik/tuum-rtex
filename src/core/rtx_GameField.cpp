@@ -337,25 +337,33 @@ namespace rtx {
   {
     const unsigned int PICKUP_DISTANCE = 100;
 
+    // y_robot to radians
+    const float T_yToRad = 1.0 / 400.0 * 50 * 3.14 / 180.0;
+
     Transform out;
     Vec2i ballPos, goalPos;
 
     ballPos = bl->getTransform()->getPosition();
-    out.setPosition(ballPos);
 
-    if(gl)
+    if(gl == nullptr)
+    {
+      // Drive directly to ball
+      Vec2f pv = ballPos.getNormalized();
+
+      out.setPosition(ballPos - pv * PICKUP_DISTANCE);
+      out.setOrientation(ballPos.y * T_yToRad);
+    }
+    else
+    {
+      // Drive to ball and keep eye on goal
       goalPos = gl->getTransform()->getPosition();
 
-    Vec2i pvec;
-    Vec2D<double> ballGoalVec;
+      Vec2f pv = ballPos.getNormalized();
+      float c_y = ballPos.y + 0.5 * (goalPos.y - ballPos.y);
 
-    if(gl) goalPos = gl->getTransform()->getPosition();
-    else goalPos = bl->getTransform()->getPosition() * 2.0;
-
-    ballGoalVec = (goalPos - ballPos).getNormalized();
-    ballGoalVec = ballPos - ballGoalVec * PICKUP_DISTANCE;
-
-    out.setOrientation(ballGoalVec.y / 400.0 * 50 * 3.14 / 180.0);
+      out.setPosition(ballPos - pv * PICKUP_DISTANCE);
+      out.setOrientation(c_y * T_yToRad);
+    }
 
     return out;
   }
