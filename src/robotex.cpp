@@ -109,10 +109,10 @@ namespace rtx {
   {
     deltaPos = motionDelta.getPosition();
 
-    deltaDistance = deltaPos.getMagnitude() / 10.0;       // Get motion distance
+    deltaDistance = deltaPos.x / 10.0;       // Get motion distance
+    deltaOrient   = motionDelta.getOrientation(); // motionDelta.getOrientation() * 180.0 / M_PI;  // Get orientation error
 
-    deltaOrient   = motionDelta.getPosition().y / 400.0 * 50; // motionDelta.getOrientation() * 180.0 / M_PI;  // Get orientation error
-
+    if(abs(deltaDistance) < 10.0) deltaDistance = 0.0;
     if(abs(deltaOrient) < 3.0) deltaOrient = 0.0;
 
     velocityControl.SV = deltaDistance; // Set distance target
@@ -123,21 +123,22 @@ namespace rtx {
     libPID.pid_tick(0, &orientControl);
 
     // Retrieve calculated velocities
-    robotControlState->motionVector = deltaPos.getNormalized();
-    robotControlState->heading = deltaPos.getOrientation();
+    // robotControlState->motionVector = deltaPos.getNormalized();
+    robotControlState->heading = deltaPos.y / 400.0 / 50 * 3.14 / 180.0;
 
     robotControlState->velocity = velocityControl.out;
     robotControlState->angularVelocity = -1 * orientControl.out;
 
     // sim_tick(robotControlState);
 
+    if(deltaDistance == 0.0) robotControlState->velocity = 0;
+    if(deltaOrient == 0.0) robotControlState->angularVelocity = 0;
 
     // printf("[rtx::motion_handler]t=%lu, SV/deltaDistance=%.2f, PV=%.2f, PID/gVelocity=%.2f\n",
     //  velocityControl._t, velocityControl.SV, velocityControl._lastProcessValue, velocityControl.out);
 
     // printf("[rtx::motion_handler]t=%lu, SV/deltaOrient=%.2f, PV=%.2f, PID/gTurnVelocity=%.2f\n",
     //    orientControl._t, orientControl.SV, orientControl._lastProcessValue, orientControl.out);
-
 
     if(debug_clk.tick())
     {
