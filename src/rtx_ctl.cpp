@@ -242,68 +242,86 @@ namespace rtx {
 
   int LSBallNavigator::run()
   {
+    const float degToRad = M_PI / 180.0;
+
+    int dx;
+    float da;
+
+    Transform t;
+
     tuum::Navigator *gNav = (tuum::Navigator*)gSystem->findSubsystem(Navigator::GetType());
+    if(gNav == nullptr)
+    {
+      RTXLOG("Missing navigator!", LOG_ERR);
+      return -1;
+    }
 
     BallHandle bl;
     GoalHandle gl;
 
-    // if(mb->getBallSensorState()) goto OK;
     if(gGameField->countValidBalls() <= 0) goto ERR;
 
     bl = gGameField->getNearestBall();
     gl = gGameField->getOpponentGoal();
 
-    if(bl != nullptr)
+    if(bl == nullptr)
     {
-      // Calculate target position and orientation error
-      Transform t = gGameField->ballPickupPos(bl, gl);
-      // Vec2i apos;
+      gNav->navTo();
+      gNav->aim();
+      gNav->stop();
+      return 0;
+    }
 
-      // if(gl) apos = gl->getTransform()->getPosition();
-      // else apos = bl->getTransform()->getPosition();
+    // Calculate target position and orientation error
+    t = gGameField->ballPickupPos(bl, gl);
 
-      printf("dbg: %i, %.2f\n", t.getPosition().x, t.getOrientation());
-      int dx = t.getPosition().x;
-      float da = t.getOrientation();
+    dx = t.getPosition().x;
+    da = t.getOrientation();
 
-      if(dx < 3 && da < 0.03)
+    if(gl == nullptr)
+    {
+      // Merrygoround
+      gl->getTransform()->getPosition();
+
+      if(dx < 10)
       {
-	printf("nav fin %i\n", gGameField->countValidBalls());
-	hal::hw.getMotionControl()->omniDrive(0, 0, 0);
-	gNav->stop();
-	ball_pick_active = true;
-        return 1;
+        //TODO: Strafe
+
+        // Move position along Y axis
+        printf("STRAFE\n");
+        t.setPosition(t.getPosition() + Vec2i(0,  10));
+        t.setOrientation(t.getOrientation() + 10 * degToRad);
       }
 
       gNav->navTo(t.getPosition(), t.getOrientation());
+    }
+    else
+    {
+      // Cont goal aim
+      gNav->navTo(t.getPosition(), t.getOrientation());
+    }
 
-      /*
-      if(gl)
+    dx = t.getPosition().x;
+    da = t.getOrientation();
+
+    if(gl != nullptr && dx < 3 && da < 0.03)
+    {
+      printf("nav fin %i\n", gGameField->countValidBalls());
+      hal::hw.getMotionControl()->omniDrive(0, 0, 0);
+      gNav->stop();
+      ball_pick_active = true;
+      return 1;
+    }
+
+    if(!gNav->isTargetAchieved()) {
+      if(m_dbg_clk.tick())
       {
-        apos = gl->getTransform()->getPosition();
-        //gNav->aim(apos);
-      } else apos = bl->getTransform()->getPosition();
-      */
-
-      if(!gNav->isTargetAchieved()) {
-        //Deprecated: if(!gNav->isRunning()) gNav->start();
-        if(m_dbg_clk.tick())
-        {
-          Entity *ptr = bl;
-	  if(gl != nullptr) ptr = gl;
-          printf("[LSBallNavigator]Navigate to %s. Aim at %s\n", bl->toString().c_str(), ptr->toString().c_str());
-        }
-      } else {
-        goto OK;
+        Entity *ptr = bl;
+        if(gl != nullptr) ptr = gl;
+        printf("[LSBallNavigator]Navigate to %s. Aim at %s\n", bl->toString().c_str(), ptr->toString().c_str());
       }
-
     } else {
-      if(gNav != nullptr)
-      {
-        gNav->navTo();
-        gNav->aim();
-        gNav->stop();
-      }
+      goto OK;
     }
 
     return 0;
@@ -314,6 +332,7 @@ ERR:
     if(gNav != nullptr) gNav->stop();
     return -1;
   }
+
 
   bool LSBallNavigator::isRunnable() {
     //  || mb->getBallSensorState()
@@ -348,7 +367,7 @@ ERR:
     {
       ball_pick_n++;
       //printf("[LSBallPicker]#TODO: Set throw distance\n");
-    
+
       hal::hw.getMotionControl()->omniDrive(60, -0.30, 20);
     }
 
