@@ -71,7 +71,7 @@ namespace rtx {
     libPID.set_period_ms(1000 / 50, &velocityControl);
 
     libPID.init(&orientControl);
-    libPID.set_tuning(1.0, 0.0, 0.0, &orientControl);
+    libPID.set_tuning(1.6, 0.8, 0.05, &orientControl);
     libPID.set_limit(-45, 45, &orientControl);
     libPID.set_period_ms(1000 / 50, &orientControl);
 
@@ -112,6 +112,8 @@ namespace rtx {
     deltaDistance = deltaPos.getMagnitude() / 10.0;       // Get motion distance
 
     deltaOrient   = motionDelta.getPosition().y / 400.0 * 50; // motionDelta.getOrientation() * 180.0 / M_PI;  // Get orientation error
+
+    if(abs(deltaOrient) < 3.0) deltaOrient = 0.0;
 
     velocityControl.SV = deltaDistance; // Set distance target
     orientControl.SV   = deltaOrient; // Set orientation target
