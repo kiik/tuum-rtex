@@ -62,8 +62,8 @@ namespace rtx {
   void TwitchScan::_init() {
     wait_for_vision = true;
 
-    motionTimer.setPeriod(160);
-    visionTimer.setPeriod(600);
+    motionTimer.setPeriod(100);
+    visionTimer.setPeriod(400);
 
     motionTimer.start();
     visionTimer.start();

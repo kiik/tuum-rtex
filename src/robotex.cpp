@@ -71,7 +71,7 @@ namespace rtx {
     libPID.set_period_ms(1000 / 50, &velocityControl);
 
     libPID.init(&orientControl);
-    libPID.set_tuning(1.6, 0.8, 0.05, &orientControl);
+    libPID.set_tuning(0.4, 0.4, 0.1, &orientControl);
     libPID.set_limit(-45, 45, &orientControl);
     libPID.set_period_ms(1000 / 50, &orientControl);
 
